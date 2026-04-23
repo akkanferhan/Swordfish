@@ -16,7 +16,7 @@ struct PopoverRootView: View {
                 Group {
                     switch env.selectedTab {
                     case .systemHub:    SystemHubView()
-                    case .devKit:       placeholder("Dev Kit")
+                    case .devKit:       DevKitView()
                     case .productivity: ProductivityView()
                     }
                 }

@@ -9,6 +9,7 @@ final class AppEnvironment: ObservableObject {
     let displayController: DisplayController
     let caffeine: CaffeineService
     let clipboard: ClipboardService
+    let devTools: DevToolsState
     let loginItem: LoginItemManager
 
     @Published var selectedTab: PopoverTab = .systemHub
@@ -18,12 +19,14 @@ final class AppEnvironment: ObservableObject {
         displayController: DisplayController,
         caffeine: CaffeineService,
         clipboard: ClipboardService,
+        devTools: DevToolsState,
         loginItem: LoginItemManager
     ) {
         self.systemMonitor = systemMonitor
         self.displayController = displayController
         self.caffeine = caffeine
         self.clipboard = clipboard
+        self.devTools = devTools
         self.loginItem = loginItem
     }
 
@@ -37,6 +40,7 @@ final class AppEnvironment: ObservableObject {
         let displays = DisplayController()
         let caffeine = CaffeineService()
         let clipboard = ClipboardService()
+        let devTools = DevToolsState()
         let loginItem = LoginItemManager()
 
         monitor.start()
@@ -47,6 +51,7 @@ final class AppEnvironment: ObservableObject {
             displayController: displays,
             caffeine: caffeine,
             clipboard: clipboard,
+            devTools: devTools,
             loginItem: loginItem
         )
     }
