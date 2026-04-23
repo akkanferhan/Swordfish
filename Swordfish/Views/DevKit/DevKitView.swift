@@ -57,6 +57,13 @@ struct DevKitView: View {
                 ) {
                     popoverController?.openJSONViewer()
                 }
+                LaunchSection(
+                    title: "JSON to Struct",
+                    subtitle: "Generate Codable structs from a JSON sample",
+                    symbol: "swift"
+                ) {
+                    popoverController?.openJSONToSwift()
+                }
                 ExpandableSection(
                     title: "Color Picker",
                     symbol: "eyedropper",

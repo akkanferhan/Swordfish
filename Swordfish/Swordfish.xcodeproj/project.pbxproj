@@ -29,6 +29,7 @@
 		48BCC6BD728BFD994C09274B /* PopoverFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F62EB765B0CC6BF427B5C0 /* PopoverFooter.swift */; };
 		49C0F124EAA759E8C1371EAD /* JSONViewerWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780D825662FF3F800D24A741 /* JSONViewerWindowController.swift */; };
 		4DC013F296E88BAE3794096F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C477888E6DBBCC9C6BA813 /* Theme.swift */; };
+		5B73B76DC69C15F014A87D2E /* JSONToSwiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8150A41AC341EFC03DB56A1F /* JSONToSwiftView.swift */; };
 		5D13F188833F4D8CCC2052D8 /* DiskStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E782C50CB7028A32530443 /* DiskStats.swift */; };
 		6A2ABFA705409E46F2159B9C /* SystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7769A52868501668BAC5D84F /* SystemMonitor.swift */; };
 		6EA601DCADC42EFD1CD2A2D7 /* DevKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE1BF11DFE6519B58A4EC28 /* DevKitView.swift */; };
@@ -36,10 +37,12 @@
 		86F2A03AB4004398ABE4342A /* XcodeToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814EDB6304DEA6DDC87A9D8D /* XcodeToolsView.swift */; };
 		8A353EE8D1BBA12B6055C4CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1A1DDE95F859106C2E92D /* AppDelegate.swift */; };
 		8E4EC1E7AF3327E392C97A20 /* DevToolsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34040B764EDB985A70996DA1 /* DevToolsState.swift */; };
+		8EDB525FF9B4B20E7B79BF5D /* JSONToSwiftWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42387779756BD5799284FF53 /* JSONToSwiftWindowController.swift */; };
 		9CE487EB5778A0A1405C4940 /* PopoverRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E361996ADA035ABCD3B3552 /* PopoverRootView.swift */; };
 		A3E42EEF54C464D4A78A5BB7 /* LaunchSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928E6D6C6B8ED2A4551C53A1 /* LaunchSection.swift */; };
 		A4D84433D184F057E1A71F77 /* ExpandableSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC7518E200DC97ED0D644E12 /* ExpandableSection.swift */; };
 		AA69D833510EF08AC49D013E /* SwordfishApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B07ECE8957C00D6F9A8779BC /* SwordfishApp.swift */; };
+		B987B031C35E8345EB19B4AA /* JSONToSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F851E98EE50A8D3D09C8F90 /* JSONToSwift.swift */; };
 		BBBAC1EAFBAEE5B7F1F7798A /* MemoryTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752ABCDEC346A9DB6A6C29E7 /* MemoryTile.swift */; };
 		C4DB315261BABBAC0726EA9D /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE63947A8BAB58E915DEA37F /* QuickActionsView.swift */; };
 		CA1429A097CA0BC3E17605BB /* DisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4BA8DB183F5B7A417FF14A7 /* DisplayController.swift */; };
@@ -76,6 +79,7 @@
 		324F0E8E7C3E40B3C4969438 /* DisplayBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayBrightness.swift; sourceTree = "<group>"; };
 		32B2F247AE30D11794A6A1E6 /* Swordfish.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swordfish.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		34040B764EDB985A70996DA1 /* DevToolsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevToolsState.swift; sourceTree = "<group>"; };
+		42387779756BD5799284FF53 /* JSONToSwiftWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONToSwiftWindowController.swift; sourceTree = "<group>"; };
 		4387D49C9A3D037AF66D26C7 /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		474538BBB8324E8C1729E13F /* PushNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationView.swift; sourceTree = "<group>"; };
 		4C1A7CD4C0C6DAF3C4F4BD48 /* ClipboardHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryView.swift; sourceTree = "<group>"; };
@@ -86,7 +90,9 @@
 		780D825662FF3F800D24A741 /* JSONViewerWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONViewerWindowController.swift; sourceTree = "<group>"; };
 		7CC2DEA303D05C5504257CAB /* AntiSleepRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntiSleepRow.swift; sourceTree = "<group>"; };
 		7E2BE118BEFCB47AE173FF67 /* MemoryStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryStats.swift; sourceTree = "<group>"; };
+		7F851E98EE50A8D3D09C8F90 /* JSONToSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONToSwift.swift; sourceTree = "<group>"; };
 		814EDB6304DEA6DDC87A9D8D /* XcodeToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeToolsView.swift; sourceTree = "<group>"; };
+		8150A41AC341EFC03DB56A1F /* JSONToSwiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONToSwiftView.swift; sourceTree = "<group>"; };
 		82B16EFEC5688F6996C653CF /* DeepLinkLauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkLauncherView.swift; sourceTree = "<group>"; };
 		8880DB120F69B4C78E1747D9 /* JSONTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONTreeView.swift; sourceTree = "<group>"; };
 		8A834E8E9FB60D9FA68F32AA /* Badge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badge.swift; sourceTree = "<group>"; };
@@ -132,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				56E318632BAC8226F4FA932B /* DevKit */,
+				6CF65536821FEA8E8F200579 /* JSONToSwift */,
 				398D939A050B9B33945849EE /* JSONViewer */,
 				1BB4D96722D9305233C5D2A4 /* Popover */,
 				01802193CD8A73496E2ACA80 /* Productivity */,
@@ -208,6 +215,15 @@
 			path = DevKit;
 			sourceTree = "<group>";
 		};
+		6CF65536821FEA8E8F200579 /* JSONToSwift */ = {
+			isa = PBXGroup;
+			children = (
+				8150A41AC341EFC03DB56A1F /* JSONToSwiftView.swift */,
+				42387779756BD5799284FF53 /* JSONToSwiftWindowController.swift */,
+			);
+			path = JSONToSwift;
+			sourceTree = "<group>";
+		};
 		727E71316F0811723B62E269 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -218,6 +234,7 @@
 				324F0E8E7C3E40B3C4969438 /* DisplayBrightness.swift */,
 				C4BA8DB183F5B7A417FF14A7 /* DisplayController.swift */,
 				F2CD3F6EBCD0EC8C367A02EE /* HardwareSensors.swift */,
+				7F851E98EE50A8D3D09C8F90 /* JSONToSwift.swift */,
 				29687E1A7B5658A443D9F222 /* LoginItemManager.swift */,
 				7E2BE118BEFCB47AE173FF67 /* MemoryStats.swift */,
 				C4D6147DAE61DB5B86EC6859 /* SimulatorService.swift */,
@@ -374,6 +391,9 @@
 				460EDF000655B19C02F885C6 /* HardwareSensors.swift in Sources */,
 				388870D4782BE74A1FE7FE37 /* HardwareStatsSection.swift in Sources */,
 				108F33083EDD0CBF6E284D49 /* IOSSimulatorView.swift in Sources */,
+				B987B031C35E8345EB19B4AA /* JSONToSwift.swift in Sources */,
+				5B73B76DC69C15F014A87D2E /* JSONToSwiftView.swift in Sources */,
+				8EDB525FF9B4B20E7B79BF5D /* JSONToSwiftWindowController.swift in Sources */,
 				10DE27752E76BB6F0EB64B85 /* JSONTreeView.swift in Sources */,
 				0FF8FC9FF0682372A6D38FE7 /* JSONViewerView.swift in Sources */,
 				49C0F124EAA759E8C1371EAD /* JSONViewerWindowController.swift in Sources */,
