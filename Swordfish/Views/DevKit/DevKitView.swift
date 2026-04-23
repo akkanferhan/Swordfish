@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DevKitView: View {
     @State private var expanded: Section? = nil
+    @Environment(\.popoverController) private var popoverController
 
     private enum Section: String, Identifiable {
         case simulator, push, deepLink, recorder, color
@@ -48,6 +49,13 @@ struct DevKitView: View {
                     onToggle: { toggle(.recorder) }
                 ) {
                     SimulatorRecorderView()
+                }
+                LaunchSection(
+                    title: "JSON Formatter",
+                    subtitle: "Opens a dedicated viewer window with tree + raw side by side",
+                    symbol: "curlybraces"
+                ) {
+                    popoverController?.openJSONViewer()
                 }
                 ExpandableSection(
                     title: "Color Picker",
