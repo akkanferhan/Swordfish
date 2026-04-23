@@ -8,6 +8,7 @@ final class AppEnvironment: ObservableObject {
     let systemMonitor: SystemMonitor
     let displayController: DisplayController
     let caffeine: CaffeineService
+    let clipboard: ClipboardService
     let loginItem: LoginItemManager
 
     @Published var selectedTab: PopoverTab = .systemHub
@@ -16,11 +17,13 @@ final class AppEnvironment: ObservableObject {
         systemMonitor: SystemMonitor,
         displayController: DisplayController,
         caffeine: CaffeineService,
+        clipboard: ClipboardService,
         loginItem: LoginItemManager
     ) {
         self.systemMonitor = systemMonitor
         self.displayController = displayController
         self.caffeine = caffeine
+        self.clipboard = clipboard
         self.loginItem = loginItem
     }
 
@@ -33,14 +36,17 @@ final class AppEnvironment: ObservableObject {
         let monitor = SystemMonitor(sensors: sensors)
         let displays = DisplayController()
         let caffeine = CaffeineService()
+        let clipboard = ClipboardService()
         let loginItem = LoginItemManager()
 
         monitor.start()
+        clipboard.start()
 
         return AppEnvironment(
             systemMonitor: monitor,
             displayController: displays,
             caffeine: caffeine,
+            clipboard: clipboard,
             loginItem: loginItem
         )
     }
