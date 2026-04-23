@@ -4,7 +4,7 @@ struct DevKitView: View {
     @State private var expanded: Section? = nil
 
     private enum Section: String, Identifiable {
-        case simulator, push, deepLink, recorder
+        case simulator, push, deepLink, recorder, color
         var id: String { rawValue }
     }
 
@@ -48,6 +48,14 @@ struct DevKitView: View {
                     onToggle: { toggle(.recorder) }
                 ) {
                     SimulatorRecorderView()
+                }
+                ExpandableSection(
+                    title: "Color Picker",
+                    symbol: "eyedropper",
+                    isExpanded: expanded == .color,
+                    onToggle: { toggle(.color) }
+                ) {
+                    ColorPickerView()
                 }
             }
         }
