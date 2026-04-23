@@ -16,6 +16,7 @@
 		1A4F6BCE10CD9DB4B27DA0FF /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F078B7AB5ABDAD3544C4A48E /* AppEnvironment.swift */; };
 		1D3A0EA38B09361BD07B1A69 /* SimulatorRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1254AA1D177D6A0542D88CE7 /* SimulatorRecorderView.swift */; };
 		1FCFF6BE3FC289DA70AAD27F /* DeepLinkLauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B16EFEC5688F6996C653CF /* DeepLinkLauncherView.swift */; };
+		2108F63ECE8A997B0E96EA72 /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015131C55024181FF7B5E04E /* ColorPickerView.swift */; };
 		2C2C9DD923376C2E82A81D8E /* SimulatorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D6147DAE61DB5B86EC6859 /* SimulatorService.swift */; };
 		2CDF7379A6652E009D617845 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF846B13198B5C70D24999F8 /* ProcessRunner.swift */; };
 		30BA86A624E84AC454F26FE1 /* DevKitSharedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219D0AAD8EE140EE59395D13 /* DevKitSharedViews.swift */; };
@@ -58,6 +59,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		015131C55024181FF7B5E04E /* ColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
 		04EF6D115A43B5A2AF21D953 /* PopoverTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTab.swift; sourceTree = "<group>"; };
 		1254AA1D177D6A0542D88CE7 /* SimulatorRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorRecorderView.swift; sourceTree = "<group>"; };
 		12B9F991D8D4259658E79A10 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 		56E318632BAC8226F4FA932B /* DevKit */ = {
 			isa = PBXGroup;
 			children = (
+				015131C55024181FF7B5E04E /* ColorPickerView.swift */,
 				82B16EFEC5688F6996C653CF /* DeepLinkLauncherView.swift */,
 				219D0AAD8EE140EE59395D13 /* DevKitSharedViews.swift */,
 				BEE1BF11DFE6519B58A4EC28 /* DevKitView.swift */,
@@ -340,6 +343,7 @@
 				F4F06BA13758260BDC41C79F /* CaffeineService.swift in Sources */,
 				45E53F8061B75F80A5DB3BA9 /* ClipboardHistoryView.swift in Sources */,
 				12750D03763599AEC86E822D /* ClipboardService.swift in Sources */,
+				2108F63ECE8A997B0E96EA72 /* ColorPickerView.swift in Sources */,
 				1FCFF6BE3FC289DA70AAD27F /* DeepLinkLauncherView.swift in Sources */,
 				30BA86A624E84AC454F26FE1 /* DevKitSharedViews.swift in Sources */,
 				6EA601DCADC42EFD1CD2A2D7 /* DevKitView.swift in Sources */,
