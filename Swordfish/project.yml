@@ -53,6 +53,7 @@ targets:
       path: Resources/Swordfish.entitlements
       properties:
         com.apple.security.app-sandbox: false
+        com.apple.security.automation.apple-events: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.swordfish.Swordfish
