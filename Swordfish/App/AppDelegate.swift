@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private var popover: NSPopover!
     private var cancellables = Set<AnyCancellable>()
     private lazy var jsonViewer = JSONViewerWindowController(devTools: env.devTools)
+    private lazy var jsonToSwift = JSONToSwiftWindowController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         env = AppEnvironment.makeDefault()
@@ -85,6 +86,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         jsonViewer.show()
     }
 
+    func openJSONToSwift() {
+        popover.performClose(nil)
+        jsonToSwift.show()
+    }
+
     /// Temporarily suspends the popover's auto-close behavior (for modal
     /// interactions like NSColorSampler). Returns a token to restore it.
     func suspendAutoClose() -> PopoverBehaviorGuard {
@@ -107,6 +113,7 @@ struct PopoverController {
     func showPopover() { delegate.showPopover() }
     func suspendAutoClose() -> PopoverBehaviorGuard { delegate.suspendAutoClose() }
     func openJSONViewer() { delegate.openJSONViewer() }
+    func openJSONToSwift() { delegate.openJSONToSwift() }
 }
 
 @MainActor
