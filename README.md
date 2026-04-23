@@ -6,6 +6,14 @@
 
 Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools an iOS/macOS developer reaches for throughout the day: simctl-driven simulator controls, push & deep-link testing, DerivedData cleanup, a side-by-side JSON viewer, a JSON → Codable struct generator, plus system utilities (anti-sleep, display brightness, CPU/fan/memory/disk monitoring, clipboard history).
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/system.png"    alt="System tab — displays, anti-sleep, hardware, memory"         width="300" />
+  <img src="docs/screenshots/devkit.png"    alt="Dev Kit tab — Xcode tools, simulator suite, JSON windows"     width="300" />
+  <img src="docs/screenshots/clipboard.png" alt="Clipboard tab — quick actions and clipboard history"          width="300" />
+</p>
+
 ## Features
 
 ### Xcode & iOS Tooling
