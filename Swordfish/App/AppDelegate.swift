@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private(set) var env: AppEnvironment!
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
+    private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         env = AppEnvironment.makeDefault()
@@ -24,11 +25,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             button.sendAction(on: [.leftMouseUp])
         }
         updateIcon()
+
+        env.caffeine.$isEnabled
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateIcon() }
+            .store(in: &cancellables)
     }
 
     private func updateIcon() {
         guard let button = statusItem?.button else { return }
-        if let image = NSImage(systemSymbolName: "gauge.medium", accessibilityDescription: "Swordfish") {
+        let name = env.caffeine.isEnabled ? "cup.and.saucer.fill" : "gauge.medium"
+        if let image = NSImage(systemSymbolName: name, accessibilityDescription: "Swordfish") {
             image.isTemplate = true
             button.image = image
         }
@@ -43,6 +50,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         popover.animates = true
         let root = PopoverRootView()
             .environmentObject(env)
+            .environmentObject(env.systemMonitor)
+            .environmentObject(env.displayController)
+            .environmentObject(env.caffeine)
             .environmentObject(env.loginItem)
             .environment(\.popoverController, PopoverController(delegate: self))
         popover.contentViewController = NSHostingController(rootView: root)

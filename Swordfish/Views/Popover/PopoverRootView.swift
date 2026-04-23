@@ -5,7 +5,7 @@ struct PopoverRootView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            PopoverHeader()
+            PopoverHeader(onRefresh: { env.displayController.refresh() })
             TabBar(selected: Binding(
                 get: { env.selectedTab },
                 set: { env.selectedTab = $0 }
@@ -15,7 +15,7 @@ struct PopoverRootView: View {
             ScrollView {
                 Group {
                     switch env.selectedTab {
-                    case .systemHub:    placeholder("System Hub")
+                    case .systemHub:    SystemHubView()
                     case .devKit:       placeholder("Dev Kit")
                     case .productivity: placeholder("Clipboard")
                     }
