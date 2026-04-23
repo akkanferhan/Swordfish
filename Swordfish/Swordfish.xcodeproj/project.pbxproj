@@ -7,34 +7,75 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		019BAC3DAC9351096E5940E0 /* PopoverHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254850F7285C29012648ADFC /* PopoverHeader.swift */; };
+		06D0541677025C108C4BB358 /* BrandMonogram.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15901BA8DD03B78824CA062 /* BrandMonogram.swift */; };
+		0F69CDA85773E2C0B5785122 /* Sparkline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D77CD51A5A2D0185FF82AA3 /* Sparkline.swift */; };
+		166BA8A9424E8F11271EC0FF /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51852CAF868B4116D2413F7 /* TabBar.swift */; };
+		1A4F6BCE10CD9DB4B27DA0FF /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F078B7AB5ABDAD3544C4A48E /* AppEnvironment.swift */; };
 		2CDF7379A6652E009D617845 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF846B13198B5C70D24999F8 /* ProcessRunner.swift */; };
+		48BCC6BD728BFD994C09274B /* PopoverFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F62EB765B0CC6BF427B5C0 /* PopoverFooter.swift */; };
 		4DC013F296E88BAE3794096F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C477888E6DBBCC9C6BA813 /* Theme.swift */; };
 		8A353EE8D1BBA12B6055C4CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1A1DDE95F859106C2E92D /* AppDelegate.swift */; };
+		9CE487EB5778A0A1405C4940 /* PopoverRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E361996ADA035ABCD3B3552 /* PopoverRootView.swift */; };
+		A3E42EEF54C464D4A78A5BB7 /* LaunchSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928E6D6C6B8ED2A4551C53A1 /* LaunchSection.swift */; };
+		A4D84433D184F057E1A71F77 /* ExpandableSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC7518E200DC97ED0D644E12 /* ExpandableSection.swift */; };
 		AA69D833510EF08AC49D013E /* SwordfishApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B07ECE8957C00D6F9A8779BC /* SwordfishApp.swift */; };
+		D07D96379CFD896A0A15072E /* SectionTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82CC531C95F7820A6567D2C /* SectionTitle.swift */; };
 		E3596573E99077A3AB80548E /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177D9AA47292D0607E60C0E5 /* Motion.swift */; };
+		EA9DB858EC5B0836186DA248 /* PopoverTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EF6D115A43B5A2AF21D953 /* PopoverTab.swift */; };
+		EC77EF103CA3E45FF20BBD4B /* LoginItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29687E1A7B5658A443D9F222 /* LoginItemManager.swift */; };
+		EE91412CDB63C4D624C9EFAF /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79319BF4D1A4C8B65BB8072 /* Tile.swift */; };
 		EFE172E3C262F719C753C045 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7ADA3889AB7098404B6C0 /* Typography.swift */; };
 		FBF1740B64E9599804C1D71F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27E05C051461307CF7C4E2A6 /* Assets.xcassets */; };
 		FE618FC4B1C337CDC5617177 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4387D49C9A3D037AF66D26C7 /* Spacing.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04EF6D115A43B5A2AF21D953 /* PopoverTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTab.swift; sourceTree = "<group>"; };
 		177D9AA47292D0607E60C0E5 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
+		254850F7285C29012648ADFC /* PopoverHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverHeader.swift; sourceTree = "<group>"; };
 		27E05C051461307CF7C4E2A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		29687E1A7B5658A443D9F222 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
+		2E361996ADA035ABCD3B3552 /* PopoverRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverRootView.swift; sourceTree = "<group>"; };
 		32B2F247AE30D11794A6A1E6 /* Swordfish.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swordfish.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4387D49C9A3D037AF66D26C7 /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
+		928E6D6C6B8ED2A4551C53A1 /* LaunchSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchSection.swift; sourceTree = "<group>"; };
+		9D77CD51A5A2D0185FF82AA3 /* Sparkline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sparkline.swift; sourceTree = "<group>"; };
+		A51852CAF868B4116D2413F7 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
 		AF846B13198B5C70D24999F8 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessRunner.swift; sourceTree = "<group>"; };
 		B07ECE8957C00D6F9A8779BC /* SwordfishApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwordfishApp.swift; sourceTree = "<group>"; };
+		B1F62EB765B0CC6BF427B5C0 /* PopoverFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverFooter.swift; sourceTree = "<group>"; };
+		B79319BF4D1A4C8B65BB8072 /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		BCD7ADA3889AB7098404B6C0 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		D0C477888E6DBBCC9C6BA813 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		D15901BA8DD03B78824CA062 /* BrandMonogram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandMonogram.swift; sourceTree = "<group>"; };
 		DAA1A1DDE95F859106C2E92D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		EC7518E200DC97ED0D644E12 /* ExpandableSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableSection.swift; sourceTree = "<group>"; };
+		F078B7AB5ABDAD3544C4A48E /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		F82CC531C95F7820A6567D2C /* SectionTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTitle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		11E6718A338A327984CF41B0 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1BB4D96722D9305233C5D2A4 /* Popover */,
+				F4F9984D5074FEB01B6435A2 /* Shared */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		1BB4D96722D9305233C5D2A4 /* Popover */ = {
+			isa = PBXGroup;
+			children = (
+				D15901BA8DD03B78824CA062 /* BrandMonogram.swift */,
+				B1F62EB765B0CC6BF427B5C0 /* PopoverFooter.swift */,
+				254850F7285C29012648ADFC /* PopoverHeader.swift */,
+				2E361996ADA035ABCD3B3552 /* PopoverRootView.swift */,
+				04EF6D115A43B5A2AF21D953 /* PopoverTab.swift */,
+				A51852CAF868B4116D2413F7 /* TabBar.swift */,
+			);
+			path = Popover;
 			sourceTree = "<group>";
 		};
 		24A4733BB122ECE8AFDA5B41 /* Products */ = {
@@ -56,6 +97,7 @@
 		727E71316F0811723B62E269 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				29687E1A7B5658A443D9F222 /* LoginItemManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -83,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				DAA1A1DDE95F859106C2E92D /* AppDelegate.swift */,
+				F078B7AB5ABDAD3544C4A48E /* AppEnvironment.swift */,
 				B07ECE8957C00D6F9A8779BC /* SwordfishApp.swift */,
 			);
 			path = App;
@@ -99,6 +142,18 @@
 				11E6718A338A327984CF41B0 /* Views */,
 				24A4733BB122ECE8AFDA5B41 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		F4F9984D5074FEB01B6435A2 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				EC7518E200DC97ED0D644E12 /* ExpandableSection.swift */,
+				928E6D6C6B8ED2A4551C53A1 /* LaunchSection.swift */,
+				F82CC531C95F7820A6567D2C /* SectionTitle.swift */,
+				9D77CD51A5A2D0185FF82AA3 /* Sparkline.swift */,
+				B79319BF4D1A4C8B65BB8072 /* Tile.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -173,11 +228,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A353EE8D1BBA12B6055C4CD /* AppDelegate.swift in Sources */,
+				1A4F6BCE10CD9DB4B27DA0FF /* AppEnvironment.swift in Sources */,
+				06D0541677025C108C4BB358 /* BrandMonogram.swift in Sources */,
+				A4D84433D184F057E1A71F77 /* ExpandableSection.swift in Sources */,
+				A3E42EEF54C464D4A78A5BB7 /* LaunchSection.swift in Sources */,
+				EC77EF103CA3E45FF20BBD4B /* LoginItemManager.swift in Sources */,
 				E3596573E99077A3AB80548E /* Motion.swift in Sources */,
+				48BCC6BD728BFD994C09274B /* PopoverFooter.swift in Sources */,
+				019BAC3DAC9351096E5940E0 /* PopoverHeader.swift in Sources */,
+				9CE487EB5778A0A1405C4940 /* PopoverRootView.swift in Sources */,
+				EA9DB858EC5B0836186DA248 /* PopoverTab.swift in Sources */,
 				2CDF7379A6652E009D617845 /* ProcessRunner.swift in Sources */,
+				D07D96379CFD896A0A15072E /* SectionTitle.swift in Sources */,
 				FE618FC4B1C337CDC5617177 /* Spacing.swift in Sources */,
+				0F69CDA85773E2C0B5785122 /* Sparkline.swift in Sources */,
 				AA69D833510EF08AC49D013E /* SwordfishApp.swift in Sources */,
+				166BA8A9424E8F11271EC0FF /* TabBar.swift in Sources */,
 				4DC013F296E88BAE3794096F /* Theme.swift in Sources */,
+				EE91412CDB63C4D624C9EFAF /* Tile.swift in Sources */,
 				EFE172E3C262F719C753C045 /* Typography.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
