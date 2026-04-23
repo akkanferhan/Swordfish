@@ -5,15 +5,43 @@ import SwiftUI
 /// plugged in by their respective feature branches.
 @MainActor
 final class AppEnvironment: ObservableObject {
+    let systemMonitor: SystemMonitor
+    let displayController: DisplayController
+    let caffeine: CaffeineService
     let loginItem: LoginItemManager
 
     @Published var selectedTab: PopoverTab = .systemHub
 
-    init(loginItem: LoginItemManager) {
+    init(
+        systemMonitor: SystemMonitor,
+        displayController: DisplayController,
+        caffeine: CaffeineService,
+        loginItem: LoginItemManager
+    ) {
+        self.systemMonitor = systemMonitor
+        self.displayController = displayController
+        self.caffeine = caffeine
         self.loginItem = loginItem
     }
 
     static func makeDefault() -> AppEnvironment {
-        AppEnvironment(loginItem: LoginItemManager())
+        let forceMock = ProcessInfo.processInfo.environment["SWORDFISH_MOCK_SENSORS"] == "1"
+        let sensors: HardwareSensorService = forceMock
+            ? MockHardwareSensorService()
+            : IOKitHardwareSensorService()
+
+        let monitor = SystemMonitor(sensors: sensors)
+        let displays = DisplayController()
+        let caffeine = CaffeineService()
+        let loginItem = LoginItemManager()
+
+        monitor.start()
+
+        return AppEnvironment(
+            systemMonitor: monitor,
+            displayController: displays,
+            caffeine: caffeine,
+            loginItem: loginItem
+        )
     }
 }
