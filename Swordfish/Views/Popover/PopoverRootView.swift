@@ -17,7 +17,7 @@ struct PopoverRootView: View {
                     switch env.selectedTab {
                     case .systemHub:    SystemHubView()
                     case .devKit:       placeholder("Dev Kit")
-                    case .productivity: placeholder("Clipboard")
+                    case .productivity: ProductivityView()
                     }
                 }
                 .padding(.horizontal, Spacing.md)

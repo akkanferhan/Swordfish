@@ -53,6 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             .environmentObject(env.systemMonitor)
             .environmentObject(env.displayController)
             .environmentObject(env.caffeine)
+            .environmentObject(env.clipboard)
             .environmentObject(env.loginItem)
             .environment(\.popoverController, PopoverController(delegate: self))
         popover.contentViewController = NSHostingController(rootView: root)
