@@ -17,7 +17,7 @@ set -euo pipefail
 TEAM_ID="${TEAM_ID:-43THU6L26P}"
 SIGNING_IDENTITY="${SIGNING_IDENTITY:-Developer ID Application}"
 KEYCHAIN_PROFILE="${KEYCHAIN_PROFILE:-swordfish}"
-VERSION="${VERSION:-1.0}"
+VERSION="${VERSION:-1.1}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
