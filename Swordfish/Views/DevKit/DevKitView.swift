@@ -5,7 +5,7 @@ struct DevKitView: View {
     @Environment(\.popoverController) private var popoverController
 
     private enum Section: String, Identifiable {
-        case simulator, push, deepLink, recorder, color
+        case simulator, push, deepLink, recorder, color, throttle
         var id: String { rawValue }
     }
 
@@ -15,6 +15,15 @@ struct DevKitView: View {
             SoftDivider()
 
             VStack(spacing: Spacing.sm) {
+                ExpandableSection(
+                    title: "Network Link Conditioner",
+                    subtitle: "Throttle Wi-Fi / Ethernet so Simulators & apps see slower networks",
+                    symbol: "speedometer",
+                    isExpanded: expanded == .throttle,
+                    onToggle: { toggle(.throttle) }
+                ) {
+                    NetworkConditionerView()
+                }
                 ExpandableSection(
                     title: "iOS Simulator",
                     symbol: "iphone",

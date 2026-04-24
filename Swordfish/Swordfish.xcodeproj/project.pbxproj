@@ -38,6 +38,7 @@
 		8A353EE8D1BBA12B6055C4CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1A1DDE95F859106C2E92D /* AppDelegate.swift */; };
 		8E4EC1E7AF3327E392C97A20 /* DevToolsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34040B764EDB985A70996DA1 /* DevToolsState.swift */; };
 		8EDB525FF9B4B20E7B79BF5D /* JSONToSwiftWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42387779756BD5799284FF53 /* JSONToSwiftWindowController.swift */; };
+		8FD6EAE911AA46128D720D86 /* NetworkThrottleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57241A1B550F650E8996C613 /* NetworkThrottleService.swift */; };
 		9CE487EB5778A0A1405C4940 /* PopoverRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E361996ADA035ABCD3B3552 /* PopoverRootView.swift */; };
 		A3E42EEF54C464D4A78A5BB7 /* LaunchSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928E6D6C6B8ED2A4551C53A1 /* LaunchSection.swift */; };
 		A4D84433D184F057E1A71F77 /* ExpandableSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC7518E200DC97ED0D644E12 /* ExpandableSection.swift */; };
@@ -48,6 +49,7 @@
 		CA1429A097CA0BC3E17605BB /* DisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4BA8DB183F5B7A417FF14A7 /* DisplayController.swift */; };
 		CB5829A0576BB790ADCC8705 /* AntiSleepRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC2DEA303D05C5504257CAB /* AntiSleepRow.swift */; };
 		D07D96379CFD896A0A15072E /* SectionTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82CC531C95F7820A6567D2C /* SectionTitle.swift */; };
+		D2F3159D0EB64B4E18DE2DB9 /* NetworkConditionerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621799A59CDE083D101E49AD /* NetworkConditionerView.swift */; };
 		D31EAF2F4DB1609DC8B3DEB9 /* PushNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474538BBB8324E8C1729E13F /* PushNotificationView.swift */; };
 		D6561DAB9C98C88DD9592FA5 /* DiskTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE198DC6238EC7775E6AB77F /* DiskTile.swift */; };
 		DC692723FF9DF68DD0AA05C7 /* DisplaysSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D24A1DAEA70FE3AB63C9BAE /* DisplaysSection.swift */; };
@@ -83,7 +85,9 @@
 		4387D49C9A3D037AF66D26C7 /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		474538BBB8324E8C1729E13F /* PushNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationView.swift; sourceTree = "<group>"; };
 		4C1A7CD4C0C6DAF3C4F4BD48 /* ClipboardHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryView.swift; sourceTree = "<group>"; };
+		57241A1B550F650E8996C613 /* NetworkThrottleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkThrottleService.swift; sourceTree = "<group>"; };
 		61E782C50CB7028A32530443 /* DiskStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskStats.swift; sourceTree = "<group>"; };
+		621799A59CDE083D101E49AD /* NetworkConditionerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConditionerView.swift; sourceTree = "<group>"; };
 		6D24A1DAEA70FE3AB63C9BAE /* DisplaysSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaysSection.swift; sourceTree = "<group>"; };
 		752ABCDEC346A9DB6A6C29E7 /* MemoryTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryTile.swift; sourceTree = "<group>"; };
 		7769A52868501668BAC5D84F /* SystemMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMonitor.swift; sourceTree = "<group>"; };
@@ -208,6 +212,7 @@
 				219D0AAD8EE140EE59395D13 /* DevKitSharedViews.swift */,
 				BEE1BF11DFE6519B58A4EC28 /* DevKitView.swift */,
 				F1A987E4E4A8A945D9EBAAC9 /* IOSSimulatorView.swift */,
+				621799A59CDE083D101E49AD /* NetworkConditionerView.swift */,
 				474538BBB8324E8C1729E13F /* PushNotificationView.swift */,
 				1254AA1D177D6A0542D88CE7 /* SimulatorRecorderView.swift */,
 				814EDB6304DEA6DDC87A9D8D /* XcodeToolsView.swift */,
@@ -237,6 +242,7 @@
 				7F851E98EE50A8D3D09C8F90 /* JSONToSwift.swift */,
 				29687E1A7B5658A443D9F222 /* LoginItemManager.swift */,
 				7E2BE118BEFCB47AE173FF67 /* MemoryStats.swift */,
+				57241A1B550F650E8996C613 /* NetworkThrottleService.swift */,
 				C4D6147DAE61DB5B86EC6859 /* SimulatorService.swift */,
 				7769A52868501668BAC5D84F /* SystemMonitor.swift */,
 			);
@@ -402,6 +408,8 @@
 				ED3EC9119571C139BA3C41CE /* MemoryStats.swift in Sources */,
 				BBBAC1EAFBAEE5B7F1F7798A /* MemoryTile.swift in Sources */,
 				E3596573E99077A3AB80548E /* Motion.swift in Sources */,
+				D2F3159D0EB64B4E18DE2DB9 /* NetworkConditionerView.swift in Sources */,
+				8FD6EAE911AA46128D720D86 /* NetworkThrottleService.swift in Sources */,
 				48BCC6BD728BFD994C09274B /* PopoverFooter.swift in Sources */,
 				019BAC3DAC9351096E5940E0 /* PopoverHeader.swift in Sources */,
 				9CE487EB5778A0A1405C4940 /* PopoverRootView.swift in Sources */,
