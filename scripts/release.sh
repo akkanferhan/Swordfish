@@ -111,6 +111,13 @@ spctl -a -vv "$APP_PATH" 2>&1 | sed 's/^/  /'
 
 # --- package DMG ------------------------------------------------------------
 say "Building DMG"
+# Stage only the .app so xcodebuild's DistributionSummary.plist / ExportOptions.plist
+# / Packaging.log don't leak into the DMG.
+DMG_STAGE="$BUILD_DIR/dmg-stage"
+rm -rf "$DMG_STAGE"
+mkdir -p "$DMG_STAGE"
+/usr/bin/ditto "$APP_PATH" "$DMG_STAGE/Swordfish.app"
+
 # create-dmg refuses to overwrite; we already cleaned build/
 create-dmg \
     --volname "Swordfish ${VERSION}" \
@@ -122,7 +129,7 @@ create-dmg \
     --app-drop-link 400 180 \
     --no-internet-enable \
     "$DMG_PATH" \
-    "$EXPORT_DIR" \
+    "$DMG_STAGE" \
     > "$BUILD_DIR/create-dmg.log" 2>&1 || {
         tail -30 "$BUILD_DIR/create-dmg.log"
         fail "create-dmg failed"
