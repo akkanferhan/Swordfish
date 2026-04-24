@@ -23,6 +23,8 @@ Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools 
 - **Push Notification Tester** — Send APNs payloads to booted simulators with Simple / Rich / Silent presets
 - **Deep Link Launcher** — Test custom URL schemes and universal links with recent-URL history
 - **Simulator Recorder** — Records the simulator screen to MP4/HEVC on the Desktop with a live timer
+- **Network Link Conditioner** — Throttle the Mac's default route (and therefore the iOS Simulator) via `dnctl` + `pfctl` (dummynet). Presets: Off / Edge / 3G / DSL / LTE / 5% Loss / 100% Loss, each tile shows target bandwidth + delay. First use writes `/etc/sudoers.d/swordfish-throttle` so later toggles run silently.
+- **Color Picker** — System eyedropper (`NSColorSampler`), editable HEX field, recent-color history, and one-click copy rows for Swift (`UIColor` / `Color`), UIKit (RGBA), and CSS snippets
 
 ### JSON
 - **JSON Viewer** — Dedicated window: raw editor on the left, a native tree (`List` + `OutlineGroup` = `NSOutlineView` under the hood) on the right. Paste, Format, Minify, Sort Keys, with parse-error line/column reporting.
@@ -57,6 +59,7 @@ Swordfish asks for these on first use. Everything is optional — features that 
 |---|---|
 | Automation → System Events | Lock Screen (⌃⌘Q shortcut synthesis) |
 | Admin privileges (one-time auth prompt) | Flush DNS (`dscacheutil` + `killall -HUP mDNSResponder`) |
+| Admin privileges (one-time, writes a sudoers entry) | Network Link Conditioner — grants `NOPASSWD` for `/usr/sbin/dnctl` and `/sbin/pfctl` so later toggles don't prompt. Removed when the helper is uninstalled from the ••• menu. |
 | Screen Recording | Color Picker eyedropper, Quick Screenshot |
 
 ## Requirements
@@ -96,13 +99,17 @@ App/
 Services/                   — ObservableObjects, one per feature domain
   SystemMonitor.swift       — 2s polling of all hardware + memory + disk
   HardwareSensors.swift     — IOHIDEventSystemClient + SMC wrappers
+  MemoryStats.swift         — host_statistics64 wrapper (app / wired / cache)
+  DiskStats.swift           — URL.resourceValues-based volume capacity
   DisplayController.swift   — CGDisplay enumeration, brightness debounce
   DisplayBrightness.swift   — DisplayServices (dlopen) + IOAVService DDC/CI
   CaffeineService.swift     — IOPMAssertion-based anti-sleep
   ClipboardService.swift    — NSPasteboard changeCount polling
   SimulatorService.swift    — xcrun simctl wrapper
+  NetworkThrottleService.swift — dnctl + pfctl dummynet, sudoers helper
   LoginItemManager.swift    — SMAppService
   JSONToSwift.swift         — recursive Swift struct generator
+  DevToolsState.swift       — shared state across DevKit tools (picked color, etc.)
 
 Views/
   Popover/                  — status-item popover shell
