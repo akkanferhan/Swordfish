@@ -121,6 +121,8 @@ Views/
   Shared/                   — ExpandableSection, LaunchSection, Sparkline, Badge
 
 DesignSystem/               — Theme, Typography, Spacing, Motion, Radius
+
+Utilities/                  — ProcessRunner, AppVersion (Bundle helpers)
 ```
 
 Services are the source of truth. Views never talk to IOKit or shell directly — they go through the corresponding service, which makes mocking and unit testing straightforward.

@@ -12,7 +12,7 @@ struct PopoverHeader: View {
                 Text("Swordfish")
                     .font(Typography.title)
                     .foregroundStyle(Theme.TextColor.primary)
-                Text("tabs · v1.0")
+                Text("tabs · v\(AppVersion.short)")
                     .font(Typography.subtitle)
                     .foregroundStyle(Theme.TextColor.tertiary)
             }

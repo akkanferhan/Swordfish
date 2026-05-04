@@ -5,7 +5,7 @@ struct PopoverFooter: View {
 
     var body: some View {
         HStack(spacing: Spacing.smMd) {
-            Text("v1.0")
+            Text("v\(AppVersion.short)")
                 .font(Typography.monoSmall)
                 .foregroundStyle(Theme.TextColor.quaternary)
             Spacer()

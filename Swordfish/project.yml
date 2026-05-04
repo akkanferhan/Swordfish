@@ -40,8 +40,8 @@ targets:
       properties:
         CFBundleName: Swordfish
         CFBundleDisplayName: Swordfish
-        CFBundleShortVersionString: "1.1"
-        CFBundleVersion: "2"
+        CFBundleShortVersionString: "1.2"
+        CFBundleVersion: "3"
         LSUIElement: true
         LSMinimumSystemVersion: "13.0"
         NSHighResolutionCapable: true
