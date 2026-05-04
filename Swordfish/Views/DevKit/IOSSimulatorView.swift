@@ -229,11 +229,13 @@ private struct ActionButton: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 if isLoading {
+                    // controlSize(.mini) yields a ~12pt spinner that matches
+                    // the icon weight. Avoid scaleEffect + fixed frame here —
+                    // those clash with NSProgressIndicator's intrinsic size
+                    // and emit constraint warnings on macOS Tahoe.
                     ProgressView()
                         .progressViewStyle(.circular)
                         .controlSize(.mini)
-                        .scaleEffect(0.6)
-                        .frame(width: 12, height: 12)
                         .tint(tint)
                 } else {
                     Image(systemName: symbol)
