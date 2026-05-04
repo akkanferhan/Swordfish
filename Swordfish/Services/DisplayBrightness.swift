@@ -46,13 +46,17 @@ enum DisplayBrightness {
     // MARK: - External (DDC/CI via IOAVService)
 
     static func setExternalBrightness(_ value: Double, for id: CGDirectDisplayID) -> Bool {
-        guard let service = DDCService(displayID: id) else { return false }
+        guard let service = DDCService.shared(for: id) else { return false }
         let brightness = UInt8(max(0, min(100, value * 100)))
         return service.writeVCP(code: 0x10, value: UInt16(brightness))
     }
+
+    static func invalidateDDCCache(for id: CGDirectDisplayID? = nil) {
+        DDCService.invalidate(id: id)
+    }
 }
 
-// MARK: - IOAVService bridge
+// MARK: - Private framework bridges
 
 private typealias IOAVService = UnsafeMutableRawPointer
 
@@ -77,86 +81,135 @@ private func _IOAVServiceReadI2C(
     _ outputBufferSize: UInt32
 ) -> Int32
 
-/// Minimal DDC/CI helper bound to a specific display via IOAVService.
+private typealias DisplayCreateInfoDictFn = @convention(c) (CGDirectDisplayID) -> Unmanaged<CFDictionary>?
+
+private let _coreDisplayHandle: UnsafeMutableRawPointer? = dlopen(
+    "/System/Library/Frameworks/CoreDisplay.framework/CoreDisplay",
+    RTLD_LAZY
+)
+
+private let _CoreDisplay_DisplayCreateInfoDictionary: DisplayCreateInfoDictFn? = {
+    guard let handle = _coreDisplayHandle,
+          let sym = dlsym(handle, "CoreDisplay_DisplayCreateInfoDictionary") else { return nil }
+    return unsafeBitCast(sym, to: DisplayCreateInfoDictFn.self)
+}()
+
+/// DDC/CI over `IOAVService`, mirroring the m1ddc matching algorithm.
 ///
-/// Compatible with Apple Silicon (preferred path) and Intel.
+/// Compatible with Apple Silicon and Intel. Display is matched by IORegistry
+/// path (via `CoreDisplay_DisplayCreateInfoDictionary` → `IODisplayLocation`)
+/// rather than EDID vendor/product comparison, which proved unreliable in
+/// practice on macOS Sonoma+.
 final class DDCService {
     private let avService: IOAVService
+
+    private static let cacheLock = NSLock()
+    private static var cache: [CGDirectDisplayID: DDCService] = [:]
 
     init?(displayID: CGDirectDisplayID) {
         guard let avService = DDCService.matchAVService(for: displayID) else { return nil }
         self.avService = avService
     }
 
+    static func shared(for displayID: CGDirectDisplayID) -> DDCService? {
+        cacheLock.lock()
+        defer { cacheLock.unlock() }
+        if let cached = cache[displayID] { return cached }
+        guard let svc = DDCService(displayID: displayID) else { return nil }
+        cache[displayID] = svc
+        return svc
+    }
+
+    static func invalidate(id: CGDirectDisplayID?) {
+        cacheLock.lock()
+        defer { cacheLock.unlock() }
+        if let id { cache.removeValue(forKey: id) } else { cache.removeAll() }
+    }
+
     /// Write a VCP code. Brightness = 0x10, value in 0...100.
+    ///
+    /// Mirrors m1ddc's `performDDCWrite`: 10 ms warm-up, then send the same
+    /// packet twice in a row. Many monitors silently drop the first packet
+    /// when the I²C channel is idle, so a single write looks like "the slider
+    /// does nothing." Ignore the per-iteration result — even a failed write
+    /// often unblocks the channel for the next attempt.
+    @discardableResult
     func writeVCP(code: UInt8, value: UInt16) -> Bool {
         let hi = UInt8((value >> 8) & 0xFF)
         let lo = UInt8(value & 0xFF)
         // DDC/CI Set VCP feature: [len|0x80, opcode=0x03, VCP, hi, lo, checksum]
-        // Checksum: XOR of dest(0x6E) ^ source(0x51) ^ each body byte.
+        // Checksum: dest(0x6E) ^ source(0x51) ^ each body byte.
         var msg: [UInt8] = [0x84, 0x03, code, hi, lo]
         var checksum: UInt8 = 0x6E ^ 0x51
         for byte in msg { checksum ^= byte }
         msg.append(checksum)
 
-        return msg.withUnsafeBufferPointer { buf -> Bool in
-            guard let base = buf.baseAddress else { return false }
-            let result = _IOAVServiceWriteI2C(avService, 0x37, 0x51, base, UInt32(buf.count))
-            return result == 0
+        var anySuccess = false
+        for _ in 0..<2 {
+            Thread.sleep(forTimeInterval: 0.010)
+            let ok = msg.withUnsafeBufferPointer { buf -> Bool in
+                guard let base = buf.baseAddress else { return false }
+                return _IOAVServiceWriteI2C(avService, 0x37, 0x51, base, UInt32(buf.count)) == 0
+            }
+            anySuccess = anySuccess || ok
         }
+        return anySuccess
     }
 
     // MARK: - Matching
 
-    /// Walks IOReg to find the IOAVService node bound to a given display ID.
-    /// Compares `DisplayAttributes` -> `ProductAttributes` -> `ManufacturerID / ProductID`
-    /// against the display's EDID info.
+    /// Resolves the `IOAVService` bound to a given display, mirroring m1ddc:
+    /// walk the IORegistry from the root, find the entry matching the display's
+    /// `IODisplayLocation`, then keep iterating the same recursive iterator
+    /// until the next `DCPAVServiceProxy` whose `Location` is "External".
+    ///
+    /// This relies on depth-first traversal order — on Apple Silicon the AV
+    /// service node is a sibling/descendant of the display adapter under the
+    /// shared DCP container, not under the display itself.
     private static func matchAVService(for displayID: CGDirectDisplayID) -> IOAVService? {
-        let vendor = CGDisplayVendorNumber(displayID)
-        let product = CGDisplayModelNumber(displayID)
-        let serial = CGDisplaySerialNumber(displayID)
+        guard let createInfo = _CoreDisplay_DisplayCreateInfoDictionary,
+              let infoUnmanaged = createInfo(displayID) else { return nil }
+        let info = infoUnmanaged.takeRetainedValue() as NSDictionary
+        guard let displayLocation = info["IODisplayLocation"] as? String else { return nil }
 
+        let root = IORegistryGetRootEntry(kIOMainPortDefault)
         var iterator: io_iterator_t = 0
-        let matchDict = IOServiceMatching("DCPAVServiceProxy")
-        guard IOServiceGetMatchingServices(kIOMainPortDefault, matchDict, &iterator) == KERN_SUCCESS else {
-            return nil
-        }
+        guard IORegistryEntryCreateIterator(
+            root,
+            kIOServicePlane,
+            IOOptionBits(kIORegistryIterateRecursively),
+            &iterator
+        ) == KERN_SUCCESS else { return nil }
         defer { IOObjectRelease(iterator) }
 
-        while case let service = IOIteratorNext(iterator), service != 0 {
-            // Traverse up to find display attributes.
-            if let found = aligns(service: service, vendor: vendor, product: product, serial: serial) {
-                return _IOAVServiceCreateWithService(kCFAllocatorDefault, found)
+        var foundDisplay = false
+        while case let entry = IOIteratorNext(iterator), entry != 0 {
+            if !foundDisplay {
+                let path = (IORegistryEntryCopyPath(entry, kIOServicePlane)?.takeRetainedValue()) as String?
+                if path == displayLocation {
+                    foundDisplay = true
+                }
+                IOObjectRelease(entry)
+                continue
             }
-            IOObjectRelease(service)
-        }
-        return nil
-    }
 
-    private static func aligns(
-        service: io_service_t,
-        vendor: UInt32,
-        product: UInt32,
-        serial: UInt32
-    ) -> io_service_t? {
-        guard let attrs = IORegistryEntrySearchCFProperty(
-            service,
-            kIOServicePlane,
-            "DisplayAttributes" as CFString,
-            kCFAllocatorDefault,
-            IOOptionBits(kIORegistryIterateRecursively | kIORegistryIterateParents)
-        ) as? [String: Any] else { return nil }
+            let className = (IOObjectCopyClass(entry)?.takeRetainedValue()) as String? ?? ""
+            if className == "DCPAVServiceProxy" {
+                let location = IORegistryEntrySearchCFProperty(
+                    entry,
+                    kIOServicePlane,
+                    "Location" as CFString,
+                    kCFAllocatorDefault,
+                    IOOptionBits(kIORegistryIterateRecursively)
+                ) as? String
 
-        guard let productAttrs = attrs["ProductAttributes"] as? [String: Any] else { return nil }
-
-        let svcVendor = (productAttrs["ManufacturerID"] as? UInt32)
-            ?? (productAttrs["LegacyManufacturerID"] as? UInt32)
-            ?? 0
-        let svcProduct = (productAttrs["ProductID"] as? UInt32) ?? 0
-        let svcSerial = (productAttrs["SerialNumber"] as? UInt32) ?? 0
-
-        if svcVendor == vendor && svcProduct == product && (serial == 0 || svcSerial == serial) {
-            return service
+                if location == "External",
+                   let av = _IOAVServiceCreateWithService(kCFAllocatorDefault, entry) {
+                    IOObjectRelease(entry)
+                    return av
+                }
+            }
+            IOObjectRelease(entry)
         }
         return nil
     }

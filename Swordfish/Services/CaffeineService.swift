@@ -34,8 +34,12 @@ final class CaffeineService: ObservableObject {
         guard !isEnabled else { return }
         var id = IOPMAssertionID(0)
         let reason = "Swordfish — preventing sleep" as CFString
+        // PreventUserIdleDisplaySleep keeps the display awake; macOS will not
+        // idle-sleep the system while the display is held awake, so this
+        // matches Caffeine's behavior. PreventUserIdleSystemSleep alone lets
+        // the screen go dark and (in practice) the Mac still slept.
         let result = IOPMAssertionCreateWithName(
-            kIOPMAssertionTypePreventUserIdleSystemSleep as CFString,
+            kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
             IOPMAssertionLevel(kIOPMAssertionLevelOn),
             reason, &id
         )
