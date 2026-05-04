@@ -52,7 +52,7 @@ struct ExpandableSection<Content: View>: View {
             if isExpanded {
                 content()
                     .padding(.horizontal, 2)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.opacity)
             }
         }
     }
