@@ -19,13 +19,24 @@ struct Simulator: Identifiable, Equatable {
 
 @MainActor
 final class SimulatorService: ObservableObject {
+    enum PendingAction { case booting, shuttingDown }
+
     @Published private(set) var simulators: [Simulator] = []
     @Published private(set) var isLoading = false
     @Published var lastError: String?
+    /// Per-UDID action that's been launched but hasn't yet been reflected in
+    /// the polled state. Cleared once the simulator's `state` reaches the
+    /// expected value (or after a safety timeout).
+    @Published private(set) var pendingActions: [String: PendingAction] = [:]
+
+    private static let pendingTimeoutNanos: UInt64 = 60_000_000_000
 
     func refresh() {
+        // Skip if a refresh is already in flight — important when polling and a
+        // user-triggered refresh land at the same time, otherwise we'd kick off
+        // overlapping `simctl list` processes.
+        guard !isLoading else { return }
         isLoading = true
-        lastError = nil
         Task.detached(priority: .userInitiated) {
             let result = try? ProcessRunner.run("/usr/bin/xcrun", arguments: ["simctl", "list", "devices", "--json"])
             let parsed = SimulatorService.parse(result?.stdout ?? "")
@@ -34,16 +45,56 @@ final class SimulatorService: ObservableObject {
                 self?.simulators = parsed
                 self?.isLoading = false
                 if parsed.isEmpty { self?.lastError = error }
+                self?.reconcilePendingActions(against: parsed)
             }
         }
     }
 
+    /// Booting via simctl alone leaves the device booted in the background;
+    /// the user only sees a window once Simulator.app is running. Open the app
+    /// first, then issue `simctl boot`. If boot fails for any reason other
+    /// than "already booted", surface the error.
     func boot(_ sim: Simulator) {
-        run(["simctl", "boot", sim.udid])
+        markPending(udid: sim.udid, action: .booting)
+        openSimulatorApp()
+        Task.detached(priority: .userInitiated) {
+            let result = try? ProcessRunner.run("/usr/bin/xcrun", arguments: ["simctl", "boot", sim.udid])
+            await MainActor.run { [weak self] in
+                if let r = result, r.exitCode != 0 {
+                    let stderr = r.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
+                    // simctl returns non-zero with "Unable to boot device in current state: Booted"
+                    // when the device is already booted — that's not an error to surface.
+                    if !stderr.contains("Booted") {
+                        self?.lastError = stderr.isEmpty
+                            ? "simctl boot failed (exit \(r.exitCode))"
+                            : stderr
+                        self?.pendingActions.removeValue(forKey: sim.udid)
+                    }
+                }
+                self?.refresh()
+            }
+        }
     }
 
     func shutdown(_ sim: Simulator) {
-        run(["simctl", "shutdown", sim.udid])
+        markPending(udid: sim.udid, action: .shuttingDown)
+        Task.detached(priority: .userInitiated) {
+            let result = try? ProcessRunner.run("/usr/bin/xcrun", arguments: ["simctl", "shutdown", sim.udid])
+            await MainActor.run { [weak self] in
+                if let r = result, r.exitCode != 0 {
+                    let stderr = r.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
+                    // simctl says "Unable to shutdown device in current state: Shutdown"
+                    // when it's already off — not an error.
+                    if !stderr.lowercased().contains("shutdown") {
+                        self?.lastError = stderr.isEmpty
+                            ? "simctl shutdown failed (exit \(r.exitCode))"
+                            : stderr
+                        self?.pendingActions.removeValue(forKey: sim.udid)
+                    }
+                }
+                self?.refresh()
+            }
+        }
     }
 
     /// Removes the simulator entirely (disappears from the list).
@@ -95,6 +146,38 @@ final class SimulatorService: ObservableObject {
         Task.detached(priority: .userInitiated) {
             _ = try? ProcessRunner.run("/usr/bin/xcrun", arguments: args)
             await MainActor.run { [weak self] in self?.refresh() }
+        }
+    }
+
+    private func markPending(udid: String, action: PendingAction) {
+        pendingActions[udid] = action
+        // Safety net: clear after a generous timeout if the expected state
+        // never arrives (e.g. simctl hung, simulator removed externally).
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: SimulatorService.pendingTimeoutNanos)
+            await MainActor.run {
+                if self?.pendingActions[udid] == action {
+                    self?.pendingActions.removeValue(forKey: udid)
+                }
+            }
+        }
+    }
+
+    private func reconcilePendingActions(against simulators: [Simulator]) {
+        guard !pendingActions.isEmpty else { return }
+        for (udid, action) in pendingActions {
+            guard let sim = simulators.first(where: { $0.udid == udid }) else {
+                pendingActions.removeValue(forKey: udid)
+                continue
+            }
+            switch action {
+            case .booting where sim.isBooted:
+                pendingActions.removeValue(forKey: udid)
+            case .shuttingDown where !sim.isBooted:
+                pendingActions.removeValue(forKey: udid)
+            default:
+                break
+            }
         }
     }
 

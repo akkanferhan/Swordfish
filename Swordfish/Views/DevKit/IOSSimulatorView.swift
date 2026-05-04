@@ -22,7 +22,16 @@ struct IOSSimulatorView: View {
                 simulatorList
             }
         }
-        .task { service.refresh() }
+        .task {
+            // Poll while the section is visible so booting/shutdown transitions
+            // and changes made from Simulator.app or Xcode show up without a
+            // manual refresh. The task is cancelled automatically when the view
+            // is collapsed.
+            while !Task.isCancelled {
+                service.refresh()
+                try? await Task.sleep(nanoseconds: 2_500_000_000)
+            }
+        }
         .onChange(of: service.lastError) { newValue in
             guard newValue != nil else { return }
             let captured = newValue
@@ -74,6 +83,7 @@ struct IOSSimulatorView: View {
                         SimulatorRow(
                             sim: sim,
                             isPendingDelete: pendingDeleteUDID == sim.udid,
+                            pendingAction: service.pendingActions[sim.udid],
                             onToggleBootState: {
                                 sim.isBooted ? service.shutdown(sim) : service.boot(sim)
                             },
@@ -138,10 +148,13 @@ struct IOSSimulatorView: View {
 private struct SimulatorRow: View {
     let sim: Simulator
     let isPendingDelete: Bool
+    let pendingAction: SimulatorService.PendingAction?
     let onToggleBootState: () -> Void
     let onDeleteRequest: () -> Void
 
     @State private var hovering = false
+
+    private var isPendingBootChange: Bool { pendingAction != nil }
 
     var body: some View {
         HStack(spacing: Spacing.sm) {
@@ -168,11 +181,12 @@ private struct SimulatorRow: View {
             }
             Spacer(minLength: 0)
 
-            if hovering || sim.isBooted || isPendingDelete {
+            if hovering || sim.isBooted || isPendingDelete || isPendingBootChange {
                 HStack(spacing: 4) {
                     ActionButton(
                         symbol: sim.isBooted ? "stop.fill" : "play.fill",
                         tint: sim.isBooted ? Theme.Semantic.warn : Theme.Semantic.ok,
+                        isLoading: isPendingBootChange,
                         action: onToggleBootState
                     )
                     ActionButton(
@@ -207,21 +221,31 @@ private struct ActionButton: View {
     let symbol: String
     var label: String? = nil
     let tint: Color
+    var isLoading: Bool = false
     let action: () -> Void
     @State private var hovering = false
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
-                Image(systemName: symbol)
-                    .font(.system(size: 10, weight: .medium))
-                if let label {
-                    Text(label)
-                        .font(Typography.monoSmall)
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .controlSize(.mini)
+                        .scaleEffect(0.6)
+                        .frame(width: 12, height: 12)
+                        .tint(tint)
+                } else {
+                    Image(systemName: symbol)
+                        .font(.system(size: 10, weight: .medium))
+                    if let label {
+                        Text(label)
+                            .font(Typography.monoSmall)
+                    }
                 }
             }
             .foregroundStyle(tint)
-            .padding(.horizontal, label == nil ? 6 : Spacing.sm)
+            .padding(.horizontal, (label == nil || isLoading) ? 6 : Spacing.sm)
             .padding(.vertical, 4)
             .background(
                 RoundedRectangle(cornerRadius: Radius.chip, style: .continuous)
@@ -229,6 +253,7 @@ private struct ActionButton: View {
             )
         }
         .buttonStyle(.plain)
+        .disabled(isLoading)
         .onHover { hovering = $0 }
     }
 }
