@@ -26,6 +26,11 @@ final class DisplayController: ObservableObject {
     }
 
     func refresh() {
+        // Configuration may have changed (display unplugged, resolution swap),
+        // so the IOAVService we cached for an external display may no longer be
+        // bound to it. Drop the cache and rematch lazily on next write.
+        DisplayBrightness.invalidateDDCCache()
+
         var displayCount: UInt32 = 0
         var activeDisplays = [CGDirectDisplayID](repeating: 0, count: 16)
         CGGetActiveDisplayList(16, &activeDisplays, &displayCount)

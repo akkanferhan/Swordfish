@@ -25,6 +25,7 @@ private struct DisplayRow: View {
     let onBrightnessChange: (Double) -> Void
 
     @State private var value: Double
+    @State private var suppressWrite = false
 
     init(display: DisplayDevice, onBrightnessChange: @escaping (Double) -> Void) {
         self.display = display
@@ -53,15 +54,27 @@ private struct DisplayRow: View {
                     Image(systemName: "sun.max")
                         .foregroundStyle(Theme.TextColor.tertiary)
                         .font(.system(size: 11))
-                    Slider(value: $value, in: 0...1) { editing in
-                        if !editing { onBrightnessChange(value) }
-                    }
+                    Slider(value: $value, in: 0...1)
                     Text("\(Int(value * 100))%")
                         .font(Typography.monoSmall)
                         .foregroundStyle(Theme.TextColor.secondary)
                         .frame(width: 36, alignment: .trailing)
                 }
             }
+        }
+        .onChange(of: value) { newValue in
+            if suppressWrite {
+                suppressWrite = false
+                return
+            }
+            onBrightnessChange(newValue)
+        }
+        .onChange(of: display.brightness) { newValue in
+            // Outside source updated brightness (refresh, hotkey) — sync the
+            // slider without re-triggering a DDC write.
+            guard abs(newValue - value) > 0.005 else { return }
+            suppressWrite = true
+            value = newValue
         }
     }
 }
