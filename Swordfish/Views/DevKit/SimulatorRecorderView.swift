@@ -95,12 +95,12 @@ struct SimulatorRecorderView: View {
             Spacer()
             if recorder.isRecording {
                 Button(action: stop) {
-                    recordButtonLabel(symbol: "stop.fill", label: "Stop", tint: Theme.Semantic.danger)
+                    recordButtonLabel(symbol: "stop.fill", label: String(localized: "Stop"), tint: Theme.Semantic.danger)
                 }
                 .buttonStyle(.plain)
             } else {
                 Button(action: start) {
-                    recordButtonLabel(symbol: "record.circle", label: "Record", tint: Color.accentColor)
+                    recordButtonLabel(symbol: "record.circle", label: String(localized: "Record"), tint: Color.accentColor)
                 }
                 .buttonStyle(.plain)
                 .disabled(selectedUDID.isEmpty)
@@ -176,8 +176,8 @@ final class SimulatorRecorder: ObservableObject {
         var isError: Bool { if case .error = self { return true }; return false }
         var message: String {
             switch self {
-            case .recording:    return "Recording…"
-            case .saved(let u): return "Saved to \(u.lastPathComponent)"
+            case .recording:    return String(localized: "Recording…")
+            case .saved(let u): return String(localized: "Saved to \(u.lastPathComponent)")
             case .error(let m): return m
             }
         }
@@ -199,7 +199,7 @@ final class SimulatorRecorder: ObservableObject {
     func start(udid: String, format: SimulatorRecorderView.Format) {
         guard !isRecording else { return }
         guard !udid.isEmpty else {
-            status = .error("Pick a booted simulator first")
+            status = .error(String(localized: "Pick a booted simulator first"))
             return
         }
 
@@ -221,7 +221,7 @@ final class SimulatorRecorder: ObservableObject {
         do {
             try proc.run()
         } catch {
-            status = .error("Failed to launch: \(error.localizedDescription)")
+            status = .error(String(localized: "Failed to launch: \(error.localizedDescription)"))
             return
         }
 
@@ -267,7 +267,7 @@ final class SimulatorRecorder: ObservableObject {
                 } else if exitCode != 0, !errStr.isEmpty {
                     self.status = .error(errStr)
                 } else {
-                    self.status = .error("Recording produced no file")
+                    self.status = .error(String(localized: "Recording produced no file"))
                 }
                 self.outputURL = nil
                 self.startedAt = nil

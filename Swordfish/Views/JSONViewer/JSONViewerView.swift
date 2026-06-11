@@ -40,7 +40,7 @@ struct JSONViewerView: View {
             guard !state.jsonInput.isEmpty else { return }
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(state.jsonInput, forType: .string)
-            showToast("Copied")
+            showToast(String(localized: "Copied"))
         } label: {
             Image(systemName: "doc.on.doc")
                 .font(.system(size: 11))
@@ -59,7 +59,7 @@ struct JSONViewerView: View {
 
     private var editorPane: some View {
         VStack(alignment: .leading, spacing: 0) {
-            paneHeader("RAW")
+            paneHeader(String(localized: "RAW"))
             TextEditor(text: $state.jsonInput)
                 .font(Typography.code)
                 .foregroundStyle(Theme.TextColor.primary)
@@ -72,7 +72,7 @@ struct JSONViewerView: View {
     @ViewBuilder
     private var rightPane: some View {
         VStack(alignment: .leading, spacing: 0) {
-            paneHeader("TREE")
+            paneHeader(String(localized: "TREE"))
             switch parseResult {
             case .empty:    emptyPane
             case .valid(let obj): JSONTreeView(root: obj)
@@ -157,14 +157,14 @@ struct JSONViewerView: View {
         HStack(spacing: Spacing.md) {
             switch parseResult {
             case .empty:
-                Badge(label: "Empty", tint: Theme.TextColor.tertiary)
+                Badge(label: String(localized: "Empty"), tint: Theme.TextColor.tertiary)
             case .valid(let obj):
-                Badge(label: "Valid", tint: Theme.Semantic.ok)
+                Badge(label: String(localized: "Valid"), tint: Theme.Semantic.ok)
                 Text(stats(for: obj))
                     .font(Typography.monoSmall)
                     .foregroundStyle(Theme.TextColor.tertiary)
             case .invalid(let info):
-                Badge(label: "Invalid", tint: Theme.Semantic.danger)
+                Badge(label: String(localized: "Invalid"), tint: Theme.Semantic.danger)
                 if let loc = info.location {
                     Text("line \(loc.line), col \(loc.col)")
                         .font(Typography.monoSmall)
@@ -239,10 +239,10 @@ struct JSONViewerView: View {
 
     private func stats(for obj: Any) -> String {
         let top: String
-        if let dict = obj as? [String: Any] { top = "\(dict.count) \(dict.count == 1 ? "key" : "keys")" }
-        else if let arr = obj as? [Any] { top = "\(arr.count) \(arr.count == 1 ? "item" : "items")" }
-        else { top = "scalar" }
-        return "\(top) · depth \(maxDepth(obj))"
+        if let dict = obj as? [String: Any] { top = String(localized: "\(dict.count) keys") }
+        else if let arr = obj as? [Any] { top = String(localized: "\(arr.count) items") }
+        else { top = String(localized: "scalar") }
+        return String(localized: "\(top) · depth \(maxDepth(obj))")
     }
 
     private func maxDepth(_ obj: Any) -> Int {
@@ -257,7 +257,7 @@ struct JSONViewerView: View {
 
     private func apply(_ op: Op) {
         guard case .valid(let obj) = parseResult else {
-            showToast("Nothing to format")
+            showToast(String(localized: "Nothing to format"))
             return
         }
         do {
@@ -272,21 +272,21 @@ struct JSONViewerView: View {
                 state.jsonInput = s
             }
         } catch {
-            showToast("Failed: \(error.localizedDescription)")
+            showToast(String(localized: "Failed: \(error.localizedDescription)"))
         }
     }
 
     private func paste() {
         guard let raw = NSPasteboard.general.string(forType: .string), !raw.isEmpty else {
-            showToast("Clipboard is empty")
+            showToast(String(localized: "Clipboard is empty"))
             return
         }
         state.jsonInput = raw
         if case .valid = parseResult {
             apply(.beautify)
-            showToast("Pasted and beautified")
+            showToast(String(localized: "Pasted and beautified"))
         } else {
-            showToast("Pasted")
+            showToast(String(localized: "Pasted"))
         }
     }
 

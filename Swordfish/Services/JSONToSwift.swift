@@ -15,7 +15,7 @@ enum JSONToSwift {
         case invalidJSON(String)
         var errorDescription: String? {
             switch self {
-            case .invalidJSON(let msg): return "Invalid JSON: \(msg)"
+            case .invalidJSON(let msg): return String(localized: "Invalid JSON: \(msg)")
             }
         }
     }

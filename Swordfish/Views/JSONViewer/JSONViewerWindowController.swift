@@ -21,7 +21,7 @@ final class JSONViewerWindowController: NSObject {
             rootView: JSONViewerView().environmentObject(devTools)
         )
         let window = NSWindow(contentViewController: hosting)
-        window.title = "JSON Viewer"
+        window.title = String(localized: "JSON Viewer")
         window.setContentSize(NSSize(width: 900, height: 640))
         window.contentMinSize = NSSize(width: 640, height: 420)
         window.styleMask = [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView]

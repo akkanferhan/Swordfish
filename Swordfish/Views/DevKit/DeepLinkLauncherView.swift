@@ -183,7 +183,7 @@ struct DeepLinkLauncherView: View {
                 "simctl", "openurl", udid, target
             ])
             let outcome: LaunchStatus = (result?.exitCode == 0)
-                ? .ok("Opened in simulator")
+                ? .ok(String(localized: "Opened in simulator"))
                 : .error((result?.stderr.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 } ?? "simctl failed")
 
             await MainActor.run {

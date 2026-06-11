@@ -94,7 +94,7 @@ struct JSONToSwiftView: View {
 
     private var inputPane: some View {
         VStack(alignment: .leading, spacing: 0) {
-            paneHeader("JSON")
+            paneHeader(String(localized: "JSON"))
             TextEditor(text: $input)
                 .font(Typography.code)
                 .foregroundStyle(Theme.TextColor.primary)
@@ -107,7 +107,7 @@ struct JSONToSwiftView: View {
     @ViewBuilder
     private var outputPane: some View {
         VStack(alignment: .leading, spacing: 0) {
-            paneHeader("SWIFT")
+            paneHeader(String(localized: "SWIFT"))
             if let error = generationResult.error {
                 errorView(error)
             } else if input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -197,12 +197,12 @@ struct JSONToSwiftView: View {
     private var statusBar: some View {
         HStack(spacing: Spacing.md) {
             if generationResult.error != nil {
-                Badge(label: "Invalid JSON", tint: Theme.Semantic.danger)
+                Badge(label: String(localized: "Invalid JSON"), tint: Theme.Semantic.danger)
             } else if generationResult.output.isEmpty {
-                Badge(label: "Empty", tint: Theme.TextColor.tertiary)
+                Badge(label: String(localized: "Empty"), tint: Theme.TextColor.tertiary)
             } else {
-                Badge(label: "Ready", tint: Theme.Semantic.ok)
-                Text("\(structCount) \(structCount == 1 ? "struct" : "structs")")
+                Badge(label: String(localized: "Ready"), tint: Theme.Semantic.ok)
+                Text("\(structCount) structs")
                     .font(Typography.monoSmall)
                     .foregroundStyle(Theme.TextColor.tertiary)
             }
@@ -249,11 +249,11 @@ struct JSONToSwiftView: View {
 
     private func paste() {
         guard let raw = NSPasteboard.general.string(forType: .string), !raw.isEmpty else {
-            showToast("Clipboard is empty")
+            showToast(String(localized: "Clipboard is empty"))
             return
         }
         input = raw
-        showToast("Pasted")
+        showToast(String(localized: "Pasted"))
     }
 
     private func copyOutput() {
@@ -261,7 +261,7 @@ struct JSONToSwiftView: View {
         guard !text.isEmpty else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
-        showToast("Copied Swift")
+        showToast(String(localized: "Copied Swift"))
     }
 
     private func showToast(_ message: String) {

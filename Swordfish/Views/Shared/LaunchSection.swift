@@ -3,8 +3,8 @@ import SwiftUI
 /// A row that visually matches `ExpandableSection` but triggers an action
 /// (e.g., opens a dedicated window) instead of expanding inline content.
 struct LaunchSection: View {
-    let title: String
-    var subtitle: String? = nil
+    let title: LocalizedStringKey
+    var subtitle: LocalizedStringKey? = nil
     let symbol: String
     let action: () -> Void
 

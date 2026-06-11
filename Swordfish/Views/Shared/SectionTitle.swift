@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct SectionTitle: View {
-    let title: String
+    // `badge` stays String — call sites feed it dynamic values (counts, states).
+    let title: LocalizedStringKey
     var badge: String? = nil
 
     var body: some View {

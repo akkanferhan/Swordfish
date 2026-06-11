@@ -5,7 +5,7 @@ struct ClipboardHistoryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionTitle(title: "Clipboard History", badge: "\(clipboard.items.count) items")
+            SectionTitle(title: "Clipboard History", badge: String(localized: "\(clipboard.items.count) items"))
             Picker("", selection: $clipboard.filter) {
                 ForEach(ClipboardService.Filter.allCases) { f in
                     Text(f.label).tag(f)
@@ -101,9 +101,9 @@ private struct ClipboardRow: View {
 
     private func label(for kind: ClipboardItem.Kind) -> String {
         switch kind {
-        case .text: return "text"
-        case .link: return "link"
-        case .code: return "code"
+        case .text: return String(localized: "text")
+        case .link: return String(localized: "link")
+        case .code: return String(localized: "code")
         }
     }
 

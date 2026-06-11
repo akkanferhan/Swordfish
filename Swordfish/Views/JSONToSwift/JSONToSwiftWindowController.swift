@@ -13,7 +13,7 @@ final class JSONToSwiftWindowController: NSObject {
         }
         let hosting = NSHostingController(rootView: JSONToSwiftView())
         let window = NSWindow(contentViewController: hosting)
-        window.title = "JSON to Struct"
+        window.title = String(localized: "JSON to Struct")
         window.setContentSize(NSSize(width: 960, height: 640))
         window.contentMinSize = NSSize(width: 680, height: 420)
         window.styleMask = [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView]

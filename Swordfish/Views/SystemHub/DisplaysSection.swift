@@ -7,7 +7,7 @@ struct DisplaysSection: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             SectionTitle(
                 title: "Displays",
-                badge: "DDC · \(controller.displays.count) connected"
+                badge: String(localized: "DDC · \(controller.displays.count) connected")
             )
             VStack(spacing: Spacing.sm) {
                 ForEach(controller.displays) { display in

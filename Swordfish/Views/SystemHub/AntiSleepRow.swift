@@ -92,10 +92,10 @@ struct AntiSleepRow: View {
     }
 
     private var lidStatusText: String {
-        if lidSleep.isBusy { return "Working…" }
-        if lidSleep.isEnabled { return "Mac stays awake with the lid closed" }
-        if !lidSleep.isHelperInstalled { return "One-time admin prompt on first use" }
-        return "Sleeps normally when lid closes"
+        if lidSleep.isBusy { return String(localized: "Working…") }
+        if lidSleep.isEnabled { return String(localized: "Mac stays awake with the lid closed") }
+        if !lidSleep.isHelperInstalled { return String(localized: "One-time admin prompt on first use") }
+        return String(localized: "Sleeps normally when lid closes")
     }
 
     // MARK: - Status line
@@ -118,7 +118,7 @@ struct AntiSleepRow: View {
                 }
             }
         } else {
-            Text(caffeine.duration == .indefinite ? "Idle" : "Idle · \(caffeine.duration.label) preset")
+            Text(caffeine.duration == .indefinite ? String(localized: "Idle") : String(localized: "Idle · \(caffeine.duration.label) preset"))
                 .font(Typography.monoSmall)
                 .foregroundStyle(Theme.TextColor.tertiary)
         }
