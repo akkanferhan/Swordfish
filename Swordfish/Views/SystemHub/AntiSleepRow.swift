@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AntiSleepRow: View {
     @EnvironmentObject var caffeine: CaffeineService
+    @EnvironmentObject var lidSleep: LidSleepService
 
     var body: some View {
         Tile {
@@ -38,8 +39,63 @@ struct AntiSleepRow: View {
                         set: { caffeine.setDuration($0) }
                     )
                 )
+
+                Divider()
+
+                lidClosedRow
+
+                if let err = lidSleep.lastError {
+                    Text(err)
+                        .font(Typography.monoSmall)
+                        .foregroundStyle(Theme.Semantic.danger)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
+        .onAppear {
+            lidSleep.refreshHelperStatus()
+            lidSleep.refreshState()
+        }
+    }
+
+    // MARK: - Lid-closed mode
+
+    private var lidClosedRow: some View {
+        HStack(spacing: Spacing.md) {
+            Image(systemName: "laptopcomputer")
+                .font(.system(size: 15))
+                .foregroundStyle(lidSleep.isEnabled ? Theme.Semantic.warn : Theme.TextColor.secondary)
+                .frame(width: 22)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Lid-Closed Mode")
+                    .font(Typography.bodyMedium)
+                    .foregroundStyle(Theme.TextColor.primary)
+                Text(lidStatusText)
+                    .font(Typography.monoSmall)
+                    .foregroundStyle(lidSleep.isEnabled ? Theme.Semantic.warn : Theme.TextColor.tertiary)
+            }
+            Spacer()
+            Toggle("", isOn: Binding(
+                get: { lidSleep.isEnabled },
+                set: { lidSleep.setEnabled($0) }
+            ))
+            .toggleStyle(.switch)
+            .labelsHidden()
+            .controlSize(.small)
+            .disabled(lidSleep.isBusy)
+        }
+        .contextMenu {
+            if lidSleep.isHelperInstalled {
+                Button("Remove helper & restore sleep…", role: .destructive, action: lidSleep.uninstallHelper)
+            }
+        }
+    }
+
+    private var lidStatusText: String {
+        if lidSleep.isBusy { return "Working…" }
+        if lidSleep.isEnabled { return "Mac stays awake with the lid closed" }
+        if !lidSleep.isHelperInstalled { return "One-time admin prompt on first use" }
+        return "Sleeps normally when lid closes"
     }
 
     // MARK: - Status line

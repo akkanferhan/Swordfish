@@ -32,9 +32,11 @@
 		4DC013F296E88BAE3794096F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C477888E6DBBCC9C6BA813 /* Theme.swift */; };
 		5B73B76DC69C15F014A87D2E /* JSONToSwiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8150A41AC341EFC03DB56A1F /* JSONToSwiftView.swift */; };
 		5D13F188833F4D8CCC2052D8 /* DiskStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E782C50CB7028A32530443 /* DiskStats.swift */; };
+		62A64089DDAA83DF716CF5C7 /* AdminShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E28FAC0E174B8DEA9D8C94 /* AdminShell.swift */; };
 		6A2ABFA705409E46F2159B9C /* SystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7769A52868501668BAC5D84F /* SystemMonitor.swift */; };
 		6EA601DCADC42EFD1CD2A2D7 /* DevKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE1BF11DFE6519B58A4EC28 /* DevKitView.swift */; };
 		7F4A26BA8F9DE2551F63C8FC /* ProductivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04F2DC3D5B27957A2B9A824 /* ProductivityView.swift */; };
+		84C9031F34A03DF32413C8FC /* LidSleepService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B711D164EA851A6940C3ED /* LidSleepService.swift */; };
 		86F2A03AB4004398ABE4342A /* XcodeToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814EDB6304DEA6DDC87A9D8D /* XcodeToolsView.swift */; };
 		8A353EE8D1BBA12B6055C4CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1A1DDE95F859106C2E92D /* AppDelegate.swift */; };
 		8E4EC1E7AF3327E392C97A20 /* DevToolsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34040B764EDB985A70996DA1 /* DevToolsState.swift */; };
@@ -75,6 +77,7 @@
 		165B07AE5F288F8AC8D5356E /* HardwareStatsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareStatsSection.swift; sourceTree = "<group>"; };
 		177D9AA47292D0607E60C0E5 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
 		219D0AAD8EE140EE59395D13 /* DevKitSharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevKitSharedViews.swift; sourceTree = "<group>"; };
+		24E28FAC0E174B8DEA9D8C94 /* AdminShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminShell.swift; sourceTree = "<group>"; };
 		254850F7285C29012648ADFC /* PopoverHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverHeader.swift; sourceTree = "<group>"; };
 		27E05C051461307CF7C4E2A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		29687E1A7B5658A443D9F222 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
@@ -100,6 +103,7 @@
 		814EDB6304DEA6DDC87A9D8D /* XcodeToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeToolsView.swift; sourceTree = "<group>"; };
 		8150A41AC341EFC03DB56A1F /* JSONToSwiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONToSwiftView.swift; sourceTree = "<group>"; };
 		82B16EFEC5688F6996C653CF /* DeepLinkLauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkLauncherView.swift; sourceTree = "<group>"; };
+		85B711D164EA851A6940C3ED /* LidSleepService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidSleepService.swift; sourceTree = "<group>"; };
 		8880DB120F69B4C78E1747D9 /* JSONTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONTreeView.swift; sourceTree = "<group>"; };
 		8A834E8E9FB60D9FA68F32AA /* Badge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badge.swift; sourceTree = "<group>"; };
 		928E6D6C6B8ED2A4551C53A1 /* LaunchSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchSection.swift; sourceTree = "<group>"; };
@@ -242,6 +246,7 @@
 				C4BA8DB183F5B7A417FF14A7 /* DisplayController.swift */,
 				F2CD3F6EBCD0EC8C367A02EE /* HardwareSensors.swift */,
 				7F851E98EE50A8D3D09C8F90 /* JSONToSwift.swift */,
+				85B711D164EA851A6940C3ED /* LidSleepService.swift */,
 				29687E1A7B5658A443D9F222 /* LoginItemManager.swift */,
 				7E2BE118BEFCB47AE173FF67 /* MemoryStats.swift */,
 				57241A1B550F650E8996C613 /* NetworkThrottleService.swift */,
@@ -265,6 +270,7 @@
 		7B226E7565EA77DF48EC7BFD /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				24E28FAC0E174B8DEA9D8C94 /* AdminShell.swift */,
 				55F965060010C73501753CA7 /* AppVersion.swift */,
 				AF846B13198B5C70D24999F8 /* ProcessRunner.swift */,
 			);
@@ -378,6 +384,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62A64089DDAA83DF716CF5C7 /* AdminShell.swift in Sources */,
 				CB5829A0576BB790ADCC8705 /* AntiSleepRow.swift in Sources */,
 				8A353EE8D1BBA12B6055C4CD /* AppDelegate.swift in Sources */,
 				1A4F6BCE10CD9DB4B27DA0FF /* AppEnvironment.swift in Sources */,
@@ -408,6 +415,7 @@
 				0FF8FC9FF0682372A6D38FE7 /* JSONViewerView.swift in Sources */,
 				49C0F124EAA759E8C1371EAD /* JSONViewerWindowController.swift in Sources */,
 				A3E42EEF54C464D4A78A5BB7 /* LaunchSection.swift in Sources */,
+				84C9031F34A03DF32413C8FC /* LidSleepService.swift in Sources */,
 				EC77EF103CA3E45FF20BBD4B /* LoginItemManager.swift in Sources */,
 				ED3EC9119571C139BA3C41CE /* MemoryStats.swift in Sources */,
 				BBBAC1EAFBAEE5B7F1F7798A /* MemoryTile.swift in Sources */,

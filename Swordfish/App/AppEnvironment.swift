@@ -8,6 +8,7 @@ final class AppEnvironment: ObservableObject {
     let systemMonitor: SystemMonitor
     let displayController: DisplayController
     let caffeine: CaffeineService
+    let lidSleep: LidSleepService
     let clipboard: ClipboardService
     let devTools: DevToolsState
     let loginItem: LoginItemManager
@@ -18,6 +19,7 @@ final class AppEnvironment: ObservableObject {
         systemMonitor: SystemMonitor,
         displayController: DisplayController,
         caffeine: CaffeineService,
+        lidSleep: LidSleepService,
         clipboard: ClipboardService,
         devTools: DevToolsState,
         loginItem: LoginItemManager
@@ -25,6 +27,7 @@ final class AppEnvironment: ObservableObject {
         self.systemMonitor = systemMonitor
         self.displayController = displayController
         self.caffeine = caffeine
+        self.lidSleep = lidSleep
         self.clipboard = clipboard
         self.devTools = devTools
         self.loginItem = loginItem
@@ -39,6 +42,7 @@ final class AppEnvironment: ObservableObject {
         let monitor = SystemMonitor(sensors: sensors)
         let displays = DisplayController()
         let caffeine = CaffeineService()
+        let lidSleep = LidSleepService()
         let clipboard = ClipboardService()
         let devTools = DevToolsState()
         let loginItem = LoginItemManager()
@@ -50,6 +54,7 @@ final class AppEnvironment: ObservableObject {
             systemMonitor: monitor,
             displayController: displays,
             caffeine: caffeine,
+            lidSleep: lidSleep,
             clipboard: clipboard,
             devTools: devTools,
             loginItem: loginItem
