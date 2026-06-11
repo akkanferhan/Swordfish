@@ -1,22 +1,33 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
+# CI: generate the Xcode project with XcodeGen and build the app.
+# This is an xcodeproj app (no Package.swift), so `swift build` does not apply.
 
-name: Swift
+name: Build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "develop" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "develop" ]
 
 jobs:
   build:
-
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: Swordfish
+        run: xcodegen generate
+
+      - name: Build
+        run: |
+          xcodebuild \
+            -project Swordfish/Swordfish.xcodeproj \
+            -scheme Swordfish \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build
