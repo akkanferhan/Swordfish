@@ -33,6 +33,7 @@ Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools 
 ### System (popover)
 - **Displays** — DDC/CI brightness slider for external monitors (`IOAVService`) plus built-in brightness (`DisplayServices.framework`)
 - **Anti-Sleep** — Caffeine-style sleep prevention with an in-place duration picker (∞ / 15m / 1h / 2h / 5h), live countdown, and absolute end time
+- **Lid-Closed Mode** — Keeps the Mac awake even with the lid closed (`pmset -a disablesleep`). One-time admin prompt writes a sudoers entry scoped to exactly the two pmset commands; sleep is restored automatically when Swordfish quits.
 - **Hardware monitor** — CPU temperature (Apple Silicon IOHID sensors), fan RPM (SMC), 12-sample sparklines, threshold-colored bars
 - **Memory & Storage** — Live stats via `host_statistics64` + `URL.resourceValues`, with app/wired/cache breakdown and a `purge`-backed Clear RAM
 
@@ -60,6 +61,7 @@ Swordfish asks for these on first use. Everything is optional — features that 
 | Automation → System Events | Lock Screen (⌃⌘Q shortcut synthesis) |
 | Admin privileges (one-time auth prompt) | Flush DNS (`dscacheutil` + `killall -HUP mDNSResponder`) |
 | Admin privileges (one-time, writes a sudoers entry) | Network Link Conditioner — grants `NOPASSWD` for `/usr/sbin/dnctl` and `/sbin/pfctl` so later toggles don't prompt. Removed when the helper is uninstalled from the ••• menu. |
+| Admin privileges (one-time, writes a sudoers entry) | Lid-Closed Mode — grants `NOPASSWD` for exactly `pmset -a disablesleep 1/0`. Removed via right-click → "Remove helper & restore sleep". |
 | Screen Recording | Color Picker eyedropper, Quick Screenshot |
 
 ## Requirements

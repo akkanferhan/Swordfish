@@ -17,6 +17,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         setupPopover()
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        // Don't leave the Mac unable to sleep after Swordfish is gone.
+        env?.lidSleep.disableOnQuit()
+    }
+
     // MARK: - Status item
 
     private func setupStatusItem() {
@@ -55,6 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             .environmentObject(env.systemMonitor)
             .environmentObject(env.displayController)
             .environmentObject(env.caffeine)
+            .environmentObject(env.lidSleep)
             .environmentObject(env.clipboard)
             .environmentObject(env.devTools)
             .environmentObject(env.loginItem)

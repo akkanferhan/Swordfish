@@ -128,7 +128,7 @@ final class NetworkThrottleService: ObservableObject {
         """
 
         Task.detached(priority: .userInitiated) {
-            let err = Self.runAdminScript(script, prompt: "Swordfish needs your password once to enable network throttling without further prompts.")
+            let err = AdminShell.runScript(script, prompt: "Swordfish needs your password once to enable network throttling without further prompts.")
             await MainActor.run { [weak self] in
                 self?.isBusy = false
                 if let err { self?.lastError = err }
@@ -150,7 +150,7 @@ final class NetworkThrottleService: ObservableObject {
             rm -f '\(helperPath)'
             rm -f '\(pfRulesPath)'
             """
-            let err = Self.runAdminScript(script, prompt: "Swordfish needs your password to remove the network throttling helper.")
+            let err = AdminShell.runScript(script, prompt: "Swordfish needs your password to remove the network throttling helper.")
             await MainActor.run { [weak self] in
                 self?.isBusy = false
                 if let err { self?.lastError = err }
@@ -277,25 +277,5 @@ final class NetworkThrottleService: ObservableObject {
             }
         }
         return nil
-    }
-
-    /// Runs an arbitrary shell script as root via osascript's authentication
-    /// dialog. Returns nil on success, error message otherwise.
-    nonisolated private static func runAdminScript(_ script: String, prompt: String) -> String? {
-        // Quote for AppleScript: backslash, then double-quote.
-        let quoted = script
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "\"", with: "\\\"")
-        let promptQuoted = prompt
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "\"", with: "\\\"")
-        let osa = "do shell script \"\(quoted)\" with prompt \"\(promptQuoted)\" with administrator privileges"
-        let r = try? ProcessRunner.run("/usr/bin/osascript", arguments: ["-e", osa])
-        if let r, r.exitCode == 0 { return nil }
-        let msg = (r?.stderr ?? "Failed to run admin script").trimmingCharacters(in: .whitespacesAndNewlines)
-        if msg.localizedCaseInsensitiveContains("user canceled") || msg.localizedCaseInsensitiveContains("user cancelled") {
-            return nil // silent on user cancel
-        }
-        return msg.isEmpty ? "Failed (exit \(r?.exitCode ?? -1))" : msg
     }
 }
