@@ -2,7 +2,10 @@ import SwiftUI
 
 struct MemoryTile: View {
     @EnvironmentObject var monitor: SystemMonitor
-    @State private var purging = false
+
+    // Clear RAM is parked for now: the memory_pressure-backed implementation
+    // lives in SystemMonitor.clearRAM(), ready to wire back up once the UX
+    // is settled.
 
     var body: some View {
         Tile {
@@ -12,27 +15,6 @@ struct MemoryTile: View {
                         .font(Typography.monoSmall)
                         .foregroundStyle(Theme.TextColor.tertiary)
                     Spacer()
-                    Button(action: clearRAM) {
-                        HStack(spacing: 6) {
-                            Image(systemName: purging ? "arrow.clockwise" : "trash")
-                                .font(.system(size: 11, weight: .medium))
-                            Text(purging ? "Purging…" : "Clear RAM")
-                                .font(Typography.monoSmall)
-                        }
-                        .padding(.horizontal, Spacing.sm)
-                        .padding(.vertical, 5)
-                        .background(
-                            RoundedRectangle(cornerRadius: Radius.button, style: .continuous)
-                                .fill(Theme.Surface.surface2)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: Radius.button, style: .continuous)
-                                        .strokeBorder(Theme.Border.subtle, lineWidth: 1)
-                                )
-                        )
-                        .foregroundStyle(Theme.TextColor.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(purging)
                 }
 
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -52,9 +34,10 @@ struct MemoryTile: View {
                     .frame(height: 4)
 
                 HStack(spacing: Spacing.md) {
-                    LegendDot(color: Theme.Semantic.accent, label: "App", value: monitor.memory.appBytes)
-                    LegendDot(color: Theme.Semantic.warn,   label: "Wired", value: monitor.memory.wiredBytes)
-                    LegendDot(color: Theme.Semantic.ok,     label: "Cache", value: monitor.memory.cacheBytes)
+                    LegendDot(color: Theme.Semantic.accent, label: String(localized: "App"), value: monitor.memory.appBytes)
+                    LegendDot(color: Theme.Semantic.warn,   label: String(localized: "Wired"), value: monitor.memory.wiredBytes)
+                    LegendDot(color: Theme.Semantic.ok,     label: String(localized: "Cache"), value: monitor.memory.cacheBytes)
+                    LegendDot(color: .gray,                 label: String(localized: "Free"), value: monitor.memory.freeBytes)
                 }
             }
         }
@@ -65,15 +48,6 @@ struct MemoryTile: View {
         if f > 0.8 { return Theme.Semantic.danger }
         if f > 0.65 { return Theme.Semantic.warn }
         return Theme.Semantic.ok
-    }
-
-    private func clearRAM() {
-        purging = true
-        Task {
-            await monitor.clearRAM()
-            try? await Task.sleep(nanoseconds: 300_000_000)
-            purging = false
-        }
     }
 }
 
