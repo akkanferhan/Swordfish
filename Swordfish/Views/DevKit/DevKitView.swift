@@ -5,7 +5,7 @@ struct DevKitView: View {
     @Environment(\.popoverController) private var popoverController
 
     private enum Section: String, Identifiable {
-        case simulator, push, deepLink, recorder, color, throttle
+        case simulator, toolbox, push, deepLink, recorder, color, throttle
         var id: String { rawValue }
     }
 
@@ -31,6 +31,15 @@ struct DevKitView: View {
                     onToggle: { toggle(.simulator) }
                 ) {
                     IOSSimulatorView()
+                }
+                ExpandableSection(
+                    title: "Simulator Toolbox",
+                    subtitle: "Status bar, permissions, location, media & app containers for a booted Simulator",
+                    symbol: "wrench.and.screwdriver",
+                    isExpanded: expanded == .toolbox,
+                    onToggle: { toggle(.toolbox) }
+                ) {
+                    SimulatorToolboxView()
                 }
                 ExpandableSection(
                     title: "Push Notification Tester",
