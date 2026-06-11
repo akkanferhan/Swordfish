@@ -28,6 +28,12 @@ final class LidSleepService: ObservableObject {
         isHelperInstalled = FileManager.default.fileExists(atPath: helperPath)
     }
 
+    /// Whether the sudoers helper is present — exposed for the Settings
+    /// permissions overview without spinning up the full service.
+    nonisolated static var helperFileExists: Bool {
+        FileManager.default.fileExists(atPath: helperPath)
+    }
+
     /// Reads the live `SleepDisabled` flag so the toggle reflects reality even
     /// after a crash or an external `pmset` change.
     func refreshState() {
@@ -61,6 +67,23 @@ final class LidSleepService: ObservableObject {
         }
     }
 
+    /// Installs the sudoers helper without touching the current sleep state —
+    /// used by Settings → Permissions to set things up ahead of first use.
+    func installHelperOnly() {
+        guard !isBusy, !isHelperInstalled else { return }
+        isBusy = true
+        lastError = nil
+
+        Task.detached(priority: .userInitiated) {
+            let err = Self.installHelper()
+            await MainActor.run { [weak self] in
+                self?.isBusy = false
+                if let err { self?.lastError = err }
+                self?.refreshHelperStatus()
+            }
+        }
+    }
+
     func uninstallHelper() {
         guard !isBusy else { return }
         isBusy = true
@@ -71,7 +94,7 @@ final class LidSleepService: ObservableObject {
             _ = Self.runPmset(disableSleep: false)
             let err = AdminShell.runScript(
                 "rm -f '\(helperPath)'",
-                prompt: "Swordfish needs your password to remove the lid-closed anti-sleep helper."
+                prompt: String(localized: "Swordfish needs your password to remove the lid-closed anti-sleep helper.")
             )
             let actual = Self.readSleepDisabled()
             await MainActor.run { [weak self] in
@@ -106,7 +129,7 @@ final class LidSleepService: ObservableObject {
         /usr/sbin/visudo -cf "$tmp" >/dev/null
         mv "$tmp" '\(helperPath)'
         """
-        return AdminShell.runScript(script, prompt: "Swordfish needs your password once to control lid-closed sleep without further prompts.")
+        return AdminShell.runScript(script, prompt: String(localized: "Swordfish needs your password once to control lid-closed sleep without further prompts."))
     }
 
     nonisolated private static func runPmset(disableSleep on: Bool) -> String? {

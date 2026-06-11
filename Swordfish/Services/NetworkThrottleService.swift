@@ -12,13 +12,13 @@ enum ThrottlePreset: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .off:     return "Off"
-        case .edge:    return "Edge"
-        case .threeG:  return "3G"
-        case .dsl:     return "DSL"
-        case .lte:     return "LTE"
-        case .loss5:   return "5% Loss"
-        case .loss100: return "100% Loss"
+        case .off:     return String(localized: "Off")
+        case .edge:    return String(localized: "Edge")
+        case .threeG:  return String(localized: "3G")
+        case .dsl:     return String(localized: "DSL")
+        case .lte:     return String(localized: "LTE")
+        case .loss5:   return String(localized: "5% Loss")
+        case .loss100: return String(localized: "100% Loss")
         }
     }
 
@@ -37,13 +37,13 @@ enum ThrottlePreset: String, CaseIterable, Identifiable {
     /// Short human-readable line describing the throttle (shown under the tile label).
     var subtitle: String {
         switch self {
-        case .off:     return "No limit"
-        case .edge:    return "240 / 200 Kbps · 400 ms"
-        case .threeG:  return "3 / 1 Mbps · 100 ms"
-        case .dsl:     return "2 Mbps / 256 Kbps · 5 ms"
-        case .lte:     return "50 / 10 Mbps · 50 ms"
-        case .loss5:   return "5% packet loss"
-        case .loss100: return "100% packet loss"
+        case .off:     return String(localized: "No limit")
+        case .edge:    return String(localized: "240 / 200 Kbps · 400 ms")
+        case .threeG:  return String(localized: "3 / 1 Mbps · 100 ms")
+        case .dsl:     return String(localized: "2 Mbps / 256 Kbps · 5 ms")
+        case .lte:     return String(localized: "50 / 10 Mbps · 50 ms")
+        case .loss5:   return String(localized: "5% packet loss")
+        case .loss100: return String(localized: "100% packet loss")
         }
     }
 
@@ -99,6 +99,12 @@ final class NetworkThrottleService: ObservableObject {
         isHelperInstalled = FileManager.default.fileExists(atPath: helperPath)
     }
 
+    /// Whether the sudoers helper is present — exposed for the Settings
+    /// permissions overview without spinning up the full service.
+    nonisolated static var helperFileExists: Bool {
+        FileManager.default.fileExists(atPath: helperPath)
+    }
+
     func refreshInterface() {
         Task.detached(priority: .background) {
             let name = Self.currentInterface()
@@ -128,7 +134,7 @@ final class NetworkThrottleService: ObservableObject {
         """
 
         Task.detached(priority: .userInitiated) {
-            let err = AdminShell.runScript(script, prompt: "Swordfish needs your password once to enable network throttling without further prompts.")
+            let err = AdminShell.runScript(script, prompt: String(localized: "Swordfish needs your password once to enable network throttling without further prompts."))
             await MainActor.run { [weak self] in
                 self?.isBusy = false
                 if let err { self?.lastError = err }
@@ -150,7 +156,7 @@ final class NetworkThrottleService: ObservableObject {
             rm -f '\(helperPath)'
             rm -f '\(pfRulesPath)'
             """
-            let err = AdminShell.runScript(script, prompt: "Swordfish needs your password to remove the network throttling helper.")
+            let err = AdminShell.runScript(script, prompt: String(localized: "Swordfish needs your password to remove the network throttling helper."))
             await MainActor.run { [weak self] in
                 self?.isBusy = false
                 if let err { self?.lastError = err }
@@ -164,7 +170,7 @@ final class NetworkThrottleService: ObservableObject {
     func apply(_ preset: ThrottlePreset) {
         guard !isBusy else { return }
         guard isHelperInstalled else {
-            lastError = "Helper not installed. Click Enable Throttling first."
+            lastError = String(localized: "Helper not installed. Click Enable Throttling first.")
             return
         }
         isBusy = true
@@ -194,7 +200,7 @@ final class NetworkThrottleService: ObservableObject {
 
     nonisolated private static func applyOn(_ preset: ThrottlePreset) async -> String? {
         guard let iface = currentInterface(), !iface.isEmpty else {
-            return "No active network interface (not connected?)"
+            return String(localized: "No active network interface (not connected?)")
         }
         let cfg = preset.config
 
