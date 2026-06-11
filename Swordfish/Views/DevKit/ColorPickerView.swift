@@ -61,7 +61,7 @@ struct ColorPickerView: View {
                                 )
                         )
                         .onSubmit { applyHex(hexInput) }
-                    CopyMini(value: currentHex) { copy(currentHex, "HEX") }
+                    CopyMini(value: currentHex) { copy(currentHex, String(localized: "HEX")) }
                 }
             }
         }
@@ -71,8 +71,8 @@ struct ColorPickerView: View {
 
     private var formatRows: some View {
         VStack(spacing: 4) {
-            CopyableRow(label: "RGB", value: currentRGB) { copy(currentRGB, "RGB") }
-            CopyableRow(label: "HSL", value: currentHSL) { copy(currentHSL, "HSL") }
+            CopyableRow(label: String(localized: "RGB"), value: currentRGB) { copy(currentRGB, String(localized: "RGB")) }
+            CopyableRow(label: String(localized: "HSL"), value: currentHSL) { copy(currentHSL, String(localized: "HSL")) }
         }
     }
 
@@ -113,9 +113,9 @@ struct ColorPickerView: View {
 
     private var snippetRows: some View {
         VStack(spacing: 4) {
-            CopyableRow(label: "SwiftUI", value: swiftUISnippet, mono: true) { copy(swiftUISnippet, "SwiftUI") }
-            CopyableRow(label: "UIKit",   value: uiKitSnippet, mono: true)   { copy(uiKitSnippet, "UIKit") }
-            CopyableRow(label: "CSS",     value: cssSnippet, mono: true)     { copy(cssSnippet, "CSS") }
+            CopyableRow(label: String(localized: "SwiftUI"), value: swiftUISnippet, mono: true) { copy(swiftUISnippet, String(localized: "SwiftUI")) }
+            CopyableRow(label: String(localized: "UIKit"),   value: uiKitSnippet, mono: true)   { copy(uiKitSnippet, String(localized: "UIKit")) }
+            CopyableRow(label: String(localized: "CSS"),     value: cssSnippet, mono: true)     { copy(cssSnippet, String(localized: "CSS")) }
         }
     }
 
@@ -200,7 +200,7 @@ struct ColorPickerView: View {
     private func copy(_ value: String, _ label: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(value, forType: .string)
-        toast = "Copied \(label)"
+        toast = String(localized: "Copied \(label)")
         Task {
             try? await Task.sleep(nanoseconds: 1_400_000_000)
             toast = nil

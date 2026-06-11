@@ -15,16 +15,16 @@ struct XcodeToolsView: View {
             HStack(spacing: Spacing.sm) {
                 ToolButton(
                     symbol: "trash",
-                    title: "Delete DerivedData",
-                    subtitle: "Wipe all Xcode builds",
+                    title: String(localized: "Delete DerivedData"),
+                    subtitle: String(localized: "Wipe all Xcode builds"),
                     busy: isPurging,
                     tint: Theme.Semantic.danger,
                     action: deleteDerivedData
                 )
                 ToolButton(
                     symbol: "hammer",
-                    title: "Clean Build",
-                    subtitle: "Xcode active project",
+                    title: String(localized: "Clean Build"),
+                    subtitle: String(localized: "Xcode active project"),
                     busy: isCleaning,
                     tint: Color.accentColor,
                     action: cleanBuild
@@ -58,7 +58,7 @@ struct XcodeToolsView: View {
             }
             await MainActor.run {
                 isPurging = false
-                toast = "DerivedData cleared"
+                toast = String(localized: "DerivedData cleared")
                 Task { await refreshSize() }
             }
         }
@@ -86,7 +86,7 @@ struct XcodeToolsView: View {
         """
         Task.detached(priority: .userInitiated) {
             let result = try? ProcessRunner.run("/usr/bin/osascript", arguments: ["-e", script])
-            let output = (result?.stdout.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 } ?? "done"
+            let output = (result?.stdout.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "done")
             await MainActor.run {
                 isCleaning = false
                 toast = output
@@ -131,7 +131,7 @@ private struct ToolButton: View {
                 .frame(width: 32, height: 32)
 
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(busy ? "Working…" : title)
+                    Text(busy ? String(localized: "Working…") : title)
                         .font(Typography.bodyMedium)
                         .foregroundStyle(Theme.TextColor.primary)
                     Text(subtitle)

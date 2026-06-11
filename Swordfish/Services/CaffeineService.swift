@@ -9,11 +9,11 @@ final class CaffeineService: ObservableObject {
         var id: Int { rawValue }
         var label: String {
             switch self {
-            case .indefinite: return "∞"
-            case .fifteenMin: return "15m"
-            case .oneHour:    return "1h"
-            case .twoHours:   return "2h"
-            case .fiveHours:  return "5h"
+            case .indefinite: return String(localized: "∞")
+            case .fifteenMin: return String(localized: "15m")
+            case .oneHour:    return String(localized: "1h")
+            case .twoHours:   return String(localized: "2h")
+            case .fiveHours:  return String(localized: "5h")
             }
         }
     }

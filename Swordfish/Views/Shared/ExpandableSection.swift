@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct ExpandableSection<Content: View>: View {
-    let title: String
-    var subtitle: String? = nil
+    let title: LocalizedStringKey
+    var subtitle: LocalizedStringKey? = nil
     let symbol: String
     let isExpanded: Bool
     let onToggle: () -> Void

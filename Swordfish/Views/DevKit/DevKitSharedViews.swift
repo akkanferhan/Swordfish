@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct PillButton: View {
-    let title: String
+    let title: LocalizedStringKey
     let symbol: String
     let action: () -> Void
     @State private var hovering = false

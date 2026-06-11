@@ -92,7 +92,7 @@ struct NetworkConditionerView: View {
     private var statusBadge: some View {
         let active = service.activePreset != .off
         let text: String = {
-            if !active { return "Inactive" }
+            if !active { return String(localized: "Inactive") }
             if let iface = service.activeInterface {
                 return "\(service.activePreset.label) · \(iface)"
             }

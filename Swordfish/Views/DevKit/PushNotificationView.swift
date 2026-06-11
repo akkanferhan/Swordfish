@@ -11,6 +11,13 @@ struct PushNotificationView: View {
     enum Preset: String, CaseIterable, Identifiable {
         case simple = "Simple", rich = "Rich", silent = "Silent"
         var id: String { rawValue }
+        var label: LocalizedStringKey {
+            switch self {
+            case .simple: return "Simple"
+            case .rich:   return "Rich"
+            case .silent: return "Silent"
+            }
+        }
     }
 
     enum SendStatus {
@@ -23,7 +30,7 @@ struct PushNotificationView: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             targetRow
             presetRow
-            CodeEditor(text: $payload, placeholder: "Payload JSON…", minHeight: 140)
+            CodeEditor(text: $payload, placeholder: String(localized: "Payload JSON…"), minHeight: 140)
             sendRow
         }
         .task { refreshSimulators() }
@@ -96,7 +103,7 @@ struct PushNotificationView: View {
     private var presetRow: some View {
         HStack(spacing: Spacing.sm) {
             ForEach(Preset.allCases) { preset in
-                PillButton(title: preset.rawValue, symbol: icon(for: preset)) {
+                PillButton(title: preset.label, symbol: icon(for: preset)) {
                     payload = Self.defaultPayload(preset)
                 }
             }
@@ -173,7 +180,7 @@ struct PushNotificationView: View {
         // Validate JSON up front
         guard let data = payload.data(using: .utf8),
               (try? JSONSerialization.jsonObject(with: data)) != nil else {
-            status = .error("Payload is not valid JSON")
+            status = .error(String(localized: "Payload is not valid JSON"))
             return
         }
         let udid = selectedUDID
@@ -193,7 +200,7 @@ struct PushNotificationView: View {
                     "simctl", "push", udid, bundle, tmpURL.path
                 ])
                 let outcome: SendStatus = result.exitCode == 0
-                    ? .ok("Sent to simulator")
+                    ? .ok(String(localized: "Sent to simulator"))
                     : .error(result.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
                         .isEmpty ? "simctl failed" : result.stderr.trimmingCharacters(in: .whitespacesAndNewlines))
                 await MainActor.run {

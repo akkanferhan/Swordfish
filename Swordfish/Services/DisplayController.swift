@@ -43,7 +43,7 @@ final class DisplayController: ObservableObject {
             let w = mode.map { CGFloat($0.pixelWidth) } ?? CGFloat(CGDisplayPixelsWide(id))
             let h = mode.map { CGFloat($0.pixelHeight) } ?? CGFloat(CGDisplayPixelsHigh(id))
             let name = screens.first { ($0.deviceDescription[.init("NSScreenNumber")] as? NSNumber)?.uint32Value == id }?.localizedName
-                ?? (isBuiltIn ? "Built-in Display" : "External Display")
+                ?? (isBuiltIn ? String(localized: "Built-in Display") : String(localized: "External Display"))
             let brightness = readBrightness(for: id, isBuiltIn: isBuiltIn) ?? 0.75
             return DisplayDevice(
                 id: id,

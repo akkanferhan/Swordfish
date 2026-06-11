@@ -3,6 +3,7 @@ import AppKit
 
 struct PopoverHeader: View {
     @EnvironmentObject var loginItem: LoginItemManager
+    @Environment(\.popoverController) private var popoverController
     var onRefresh: () -> Void = {}
 
     var body: some View {
@@ -31,6 +32,13 @@ struct PopoverHeader: View {
 
     private var settingsMenu: some View {
         Menu {
+            Button {
+                popoverController?.openSettings()
+            } label: {
+                Label("Settings…", systemImage: "gearshape")
+            }
+            .keyboardShortcut(",", modifiers: [.command])
+            Divider()
             Toggle(isOn: Binding(
                 get: { loginItem.isEnabled },
                 set: { _ in loginItem.toggle() }

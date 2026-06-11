@@ -7,8 +7,9 @@ struct MemoryStats: Equatable {
     var appBytes: UInt64
     var wiredBytes: UInt64
     var cacheBytes: UInt64
+    var freeBytes: UInt64
 
-    static let zero = MemoryStats(totalBytes: 0, usedBytes: 0, appBytes: 0, wiredBytes: 0, cacheBytes: 0)
+    static let zero = MemoryStats(totalBytes: 0, usedBytes: 0, appBytes: 0, wiredBytes: 0, cacheBytes: 0, freeBytes: 0)
 
     var usedFraction: Double {
         guard totalBytes > 0 else { return 0 }
@@ -26,7 +27,7 @@ struct MemoryStats: Equatable {
             }
         }
         guard result == KERN_SUCCESS else {
-            return MemoryStats(totalBytes: total, usedBytes: 0, appBytes: 0, wiredBytes: 0, cacheBytes: 0)
+            return MemoryStats(totalBytes: total, usedBytes: 0, appBytes: 0, wiredBytes: 0, cacheBytes: 0, freeBytes: 0)
         }
 
         let pageSize = UInt64(vm_kernel_page_size)
@@ -34,6 +35,7 @@ struct MemoryStats: Equatable {
         let wired  = UInt64(info.wire_count) * pageSize
         let compressed = UInt64(info.compressor_page_count) * pageSize
         let cache  = UInt64(info.external_page_count) * pageSize
+        let free   = UInt64(info.free_count) * pageSize
         let used   = app + wired + compressed
 
         return MemoryStats(
@@ -41,7 +43,8 @@ struct MemoryStats: Equatable {
             usedBytes: used,
             appBytes: app,
             wiredBytes: wired,
-            cacheBytes: cache
+            cacheBytes: cache,
+            freeBytes: free
         )
     }
 }

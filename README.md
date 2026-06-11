@@ -20,6 +20,13 @@ Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools 
 - **Delete DerivedData** — One-click wipe of `~/Library/Developer/Xcode/DerivedData` with a live size readout
 - **Clean Build** — Sends "Clean Build Folder" to the active Xcode workspace via `osascript`
 - **iOS Simulator** — List, boot, shutdown, and delete simulators from `xcrun simctl list`
+- **Simulator Toolbox** — Everyday `simctl` helpers for a booted simulator in one place:
+  - **Status Bar Override** — App Store screenshot mode (9:41, full battery & signal) with editable time, battery level/state, and network indicator (`simctl status_bar`)
+  - **Permission Manager** — Grant / revoke / reset privacy services (Location, Photos, Contacts, Microphone, …) per installed app (`simctl privacy`)
+  - **Location Simulation** — City presets (Istanbul, London, New York, San Francisco, Tokyo) or custom lat/lon (`simctl location`)
+  - **Add Media** — Drag & drop images/videos (or a file picker) straight into the simulator's Photos library (`simctl addmedia`)
+  - **App Containers** — List installed user apps, copy bundle IDs, open an app's data container in Finder (`simctl listapps` + `DataContainer`)
+  - **Quick actions** — One-click simulator screenshot to Desktop (`simctl io screenshot`) and Light/Dark appearance toggle (`simctl ui appearance`)
 - **Push Notification Tester** — Send APNs payloads to booted simulators with Simple / Rich / Silent presets
 - **Deep Link Launcher** — Test custom URL schemes and universal links with recent-URL history
 - **Simulator Recorder** — Records the simulator screen to MP4/HEVC on the Desktop with a live timer
@@ -33,16 +40,20 @@ Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools 
 ### System (popover)
 - **Displays** — DDC/CI brightness slider for external monitors (`IOAVService`) plus built-in brightness (`DisplayServices.framework`)
 - **Anti-Sleep** — Caffeine-style sleep prevention with an in-place duration picker (∞ / 15m / 1h / 2h / 5h), live countdown, and absolute end time
+- **Lid-Closed Mode** — Keeps the Mac awake even with the lid closed (`pmset -a disablesleep`). One-time admin prompt writes a sudoers entry scoped to exactly the two pmset commands; sleep is restored automatically when Swordfish quits.
 - **Hardware monitor** — CPU temperature (Apple Silicon IOHID sensors), fan RPM (SMC), 12-sample sparklines, threshold-colored bars
-- **Memory & Storage** — Live stats via `host_statistics64` + `URL.resourceValues`, with app/wired/cache breakdown and a `purge`-backed Clear RAM
+- **Memory & Storage** — Live stats via `host_statistics64` + `URL.resourceValues`, with app/wired/cache/free breakdown
 
 ### Clipboard
 - **History** — Last 20 items, pinnable, filterable (All/Text/Links/Code), click to re-copy
 - **Quick Actions** — Screenshot, Lock Screen (⌃⌘Q via System Events), Flush DNS (admin prompt), Terminal
 
 ### App-level
-- **Launch at Login** — Toggleable from the gear menu via `SMAppService`
-- **Settings menu** — Quit + login toggle accessible from the popover header
+- **Settings window** (gear menu → Settings…, ⌘,) —
+  - **General**: in-app language picker (System Default / English / Türkçe, with one-click relaunch), Launch at Login (`SMAppService`), version info
+  - **Permissions**: live status of everything features depend on — Screen Recording, Automation (System Events), the two sudoers helpers (Lid-Closed Mode, Network Link Conditioner), and Xcode Developer Tools (`simctl`) — with Request / Open System Settings shortcuts and a copyable `xcode-select` fix when developer tools are missing
+- **Launch at Login** — Also toggleable directly from the gear menu
+- **Localization** — English, Turkish, Spanish, French, Serbian (Cyrillic & Latin), and Japanese via a String Catalog (`Localizable.xcstrings`); follows the system language or the in-app override
 
 ## Installation
 
@@ -60,6 +71,7 @@ Swordfish asks for these on first use. Everything is optional — features that 
 | Automation → System Events | Lock Screen (⌃⌘Q shortcut synthesis) |
 | Admin privileges (one-time auth prompt) | Flush DNS (`dscacheutil` + `killall -HUP mDNSResponder`) |
 | Admin privileges (one-time, writes a sudoers entry) | Network Link Conditioner — grants `NOPASSWD` for `/usr/sbin/dnctl` and `/sbin/pfctl` so later toggles don't prompt. Removed when the helper is uninstalled from the ••• menu. |
+| Admin privileges (one-time, writes a sudoers entry) | Lid-Closed Mode — grants `NOPASSWD` for exactly `pmset -a disablesleep 1/0`. Removed via right-click → "Remove helper & restore sleep". |
 | Screen Recording | Color Picker eyedropper, Quick Screenshot |
 
 ## Requirements

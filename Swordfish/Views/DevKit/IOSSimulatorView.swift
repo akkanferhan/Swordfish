@@ -13,11 +13,11 @@ struct IOSSimulatorView: View {
             }
 
             if service.isLoading && service.simulators.isEmpty {
-                placeholder("Loading simulators…")
+                placeholder(String(localized: "Loading simulators…"))
             } else if let error = service.lastError, service.simulators.isEmpty {
                 placeholder(error)
             } else if service.simulators.isEmpty {
-                placeholder("No simulators available")
+                placeholder(String(localized: "No simulators available"))
             } else {
                 simulatorList
             }
@@ -72,7 +72,7 @@ struct IOSSimulatorView: View {
         let booted = service.simulators.filter { $0.isBooted }.count
         return VStack(alignment: .leading, spacing: Spacing.sm) {
             HStack {
-                Text("\(service.simulators.count) simulator\(service.simulators.count == 1 ? "" : "s") · \(booted) booted")
+                Text("\(service.simulators.count) simulator(s) · \(booted) booted")
                     .font(Typography.monoSmall)
                     .foregroundStyle(Theme.TextColor.tertiary)
                 Spacer()
@@ -191,7 +191,7 @@ private struct SimulatorRow: View {
                     )
                     ActionButton(
                         symbol: isPendingDelete ? "checkmark" : "trash",
-                        label: isPendingDelete ? "Confirm?" : nil,
+                        label: isPendingDelete ? String(localized: "Confirm?") : nil,
                         tint: isPendingDelete ? Theme.Semantic.danger : Theme.TextColor.tertiary,
                         action: onDeleteRequest
                     )

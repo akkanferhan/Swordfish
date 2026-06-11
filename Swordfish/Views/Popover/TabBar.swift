@@ -30,7 +30,7 @@ private struct TabItem: View {
             HStack(spacing: 6) {
                 Image(systemName: tab.symbol)
                     .font(.system(size: 13, weight: .medium))
-                Text(tab.rawValue)
+                Text(tab.label)
                     .font(Typography.bodyMedium)
             }
             .frame(maxWidth: .infinity)

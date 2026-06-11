@@ -7,10 +7,10 @@ struct QuickActionsView: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             SectionTitle(title: "Quick Actions")
             HStack(spacing: Spacing.sm) {
-                ActionChip(symbol: "camera", label: "Screenshot", action: runScreenshot)
-                ActionChip(symbol: "lock", label: "Lock Screen", action: lockScreen)
-                ActionChip(symbol: "arrow.triangle.2.circlepath", label: "Flush DNS", action: flushDNS)
-                ActionChip(symbol: "terminal", label: "Terminal", action: openTerminal)
+                ActionChip(symbol: "camera", label: String(localized: "Screenshot"), action: runScreenshot)
+                ActionChip(symbol: "lock", label: String(localized: "Lock Screen"), action: lockScreen)
+                ActionChip(symbol: "arrow.triangle.2.circlepath", label: String(localized: "Flush DNS"), action: flushDNS)
+                ActionChip(symbol: "terminal", label: String(localized: "Terminal"), action: openTerminal)
             }
         }
     }

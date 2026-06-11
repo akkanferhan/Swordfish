@@ -84,13 +84,13 @@ private struct JSONNodeRow: View {
             if dict.isEmpty {
                 Text("{}").foregroundStyle(Theme.Syntax.punct)
             } else {
-                summaryText(open: "{", count: dict.count, singular: "key", plural: "keys", close: "}")
+                summaryText(open: "{", label: String(localized: "\(dict.count) keys"), close: "}")
             }
         } else if let arr = node.value as? [Any] {
             if arr.isEmpty {
                 Text("[]").foregroundStyle(Theme.Syntax.punct)
             } else {
-                summaryText(open: "[", count: arr.count, singular: "item", plural: "items", close: "]")
+                summaryText(open: "[", label: String(localized: "\(arr.count) items"), close: "]")
             }
         } else if let s = node.value as? String {
             Text("\"\(s)\"").foregroundStyle(Theme.Syntax.string)
@@ -107,9 +107,9 @@ private struct JSONNodeRow: View {
         }
     }
 
-    private func summaryText(open: String, count: Int, singular: String, plural: String, close: String) -> some View {
+    private func summaryText(open: String, label: String, close: String) -> some View {
         Text(open).foregroundColor(Theme.Syntax.punct)
-            + Text(" \(count) \(count == 1 ? singular : plural) ").foregroundColor(Theme.TextColor.tertiary)
+            + Text(" \(label) ").foregroundColor(Theme.TextColor.tertiary)
             + Text(close).foregroundColor(Theme.Syntax.punct)
     }
 

@@ -33,11 +33,30 @@ final class SystemMonitor: ObservableObject {
         timer = nil
     }
 
-    func clearRAM() async {
+    /// Frees memory by exerting real, bounded memory pressure
+    /// (`memory_pressure -l critical`), which makes the kernel evict file
+    /// cache and compress idle pages. `purge` is no help here: it needs root
+    /// on modern macOS (and still exits 0 when it fails), and only drops the
+    /// file cache anyway. `memory_pressure` keeps holding pressure once the
+    /// level is reached, so the bounded run is intentional — terminating it
+    /// releases its own allocations and leaves the reclaimed memory free.
+    ///
+    /// Success is measured as the growth of *free* memory, not the drop in
+    /// "used": cache eviction doesn't shrink used at all, and compression
+    /// mostly shuffles pages within it, so a used-based delta vastly
+    /// under-reports what was reclaimed.
+    @discardableResult
+    func clearRAM() async -> Int64 {
+        let before = MemoryStats.current().freeBytes
         await Task.detached(priority: .userInitiated) {
-            _ = try? ProcessRunner.run("/usr/sbin/purge", arguments: [])
+            _ = try? ProcessRunner.run("/usr/bin/memory_pressure",
+                                       arguments: ["-l", "critical"],
+                                       timeout: 10)
         }.value
+        // Give the kernel a moment to settle before re-sampling.
+        try? await Task.sleep(nanoseconds: 700_000_000)
         tick()
+        return max(0, Int64(memory.freeBytes) - Int64(before))
     }
 
     private func tick() {

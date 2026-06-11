@@ -18,7 +18,14 @@ final class ClipboardService: ObservableObject {
     enum Filter: String, CaseIterable, Identifiable {
         case all, text, links, code
         var id: String { rawValue }
-        var label: String { rawValue.capitalized }
+        var label: String {
+            switch self {
+            case .all:   return String(localized: "All")
+            case .text:  return String(localized: "Text")
+            case .links: return String(localized: "Links")
+            case .code:  return String(localized: "Code")
+            }
+        }
     }
 
     private let capacity = 20
