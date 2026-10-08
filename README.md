@@ -15,13 +15,7 @@ Swordfish is a native SwiftUI + AppKit menu bar app. Its popover has **System**,
 | [Settings](#app-level) | Configure language, startup, monitoring, clipboard behavior, API keys and permissions |
 
 ## Screenshots
-
-<p align="center">
-  <img src="docs/screenshots/system.png"    alt="System tab — displays, anti-sleep, hardware, memory"         width="300" />
-  <img src="docs/screenshots/devkit.png"    alt="Dev Kit tab — Xcode tools, simulator suite, JSON windows"     width="300" />
-  <img src="docs/screenshots/clipboard.png" alt="Clipboard tab — quick actions and clipboard history"          width="300" />
-</p>
-
+<img width="3424" height="1248" alt="App" src="https://github.com/user-attachments/assets/85600897-1ed0-4ce0-b183-220057f7defc" />
 ## Features
 
 ### Xcode & iOS Tooling
