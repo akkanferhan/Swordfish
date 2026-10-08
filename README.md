@@ -1,10 +1,18 @@
 # Swordfish
 
-> A macOS menu bar utility built for iOS and macOS engineers — Xcode housekeeping, Simulator controls, JSON tooling, and everyday system utilities in a single popover.
+> A macOS menu bar utility for iOS and macOS engineers: Xcode and Simulator tools, device and distribution workflows, network debugging, system monitoring, and clipboard productivity.
 
 ![macOS 13+](https://img.shields.io/badge/macOS-13.0%2B-blue) ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange) ![License MIT](https://img.shields.io/badge/License-MIT-green)
 
-Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools an iOS/macOS developer reaches for throughout the day: simctl-driven simulator controls, push & deep-link testing, DerivedData cleanup, a side-by-side JSON viewer, a JSON → Codable struct generator, plus system utilities (anti-sleep, display brightness, CPU/fan/memory/disk monitoring, clipboard history).
+Swordfish is a native SwiftUI + AppKit menu bar app. Its popover has **System**, **Dev Kit**, and **Clipboard** tabs. Larger tools open their own windows; the menu bar icon can also show a live system metric. The feature list below follows those entry points and includes the settings and permissions needed to use them.
+
+| Area | What you can do |
+|---|---|
+| [Dev Kit](#xcode--ios-tooling) | Manage Xcode, Simulators and physical devices; inspect builds, signing, crashes and releases; test push, links and network behavior |
+| [JSON and utilities](#json) | View and transform JSON; generate Swift types; convert common developer formats and create app assets |
+| [System](#system-popover) | Control displays, sleep, audio and appearance; monitor hardware, network, battery and processes |
+| [Clipboard](#clipboard) | Search and paste history, run content-aware actions, and use desktop quick actions |
+| [Settings](#app-level) | Configure language, startup, monitoring, clipboard behavior, API keys and permissions |
 
 ## Screenshots
 
@@ -23,8 +31,8 @@ Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools 
 - **Build Times** — Reads Xcode's build manifests in DerivedData: durations per scheme with a trend sparkline, and a notification when a build finishes (minimum duration and "only while Xcode is in the background" configurable; slower-than-usual builds are flagged)
 - **Xcode Releases & Runtimes** — Latest Xcode releases (installed ones marked) with release notes, `.xip` download or one-click install through the `xcodes` CLI, and simulator runtime downloads via `xcodebuild -downloadPlatform`
 - **Crash Symbolicator** — Drop a `.ips` or `.crash` report; dSYMs are found by UUID through Spotlight and frames resolved with `atos`. Includes a "find dSYM by UUID" lookup
-- **Clean Build** — Sends "Clean Build Folder" to the active Xcode workspace via `osascript`
-- **iOS Simulator** — List, boot, shutdown, delete, create (runtime + device type), clone, rename and erase simulators
+- **Clean Build** — Sends the clean command to the active Xcode workspace via `osascript`
+- **iOS Simulator** — List, boot, shut down (including all at once), delete, create (runtime + device type), clone, rename and erase simulators; open the Simulator app
 - **Simulator Toolbox** — Everyday `simctl` helpers for a booted simulator in one place:
   - **Status Bar Override** — App Store screenshot mode (9:41, full battery & signal) with editable time, battery level/state, and network indicator (`simctl status_bar`)
   - **Permission Manager** — Grant / revoke / reset privacy services (Location, Photos, Contacts, Microphone, …) per installed app (`simctl privacy`)
@@ -34,26 +42,25 @@ Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools 
   - **Device** — Dynamic Type size (XS…AX5), Increase Contrast, Face ID / Touch ID enroll + match / no-match, keychain reset, Mac ↔ Simulator pasteboard sync, and trusting a proxy root CA (Proxyman / Charles / mitmproxy)
   - **Quick actions** — One-click simulator screenshot to Desktop (`simctl io screenshot`) and Light/Dark appearance toggle (`simctl ui appearance`)
 - **Simulator Logs** — Dedicated window streaming a booted simulator's unified log (`simctl spawn … log stream`), filtered by process / subsystem / level, with search, errors-only, and auto-scroll
-- **Physical Devices** — Paired iPhones/iPads via `devicectl`: install `.app` / `.ipa` (drag & drop), launch by bundle ID, screenshot and crash-log export to the Desktop
+- **Physical Devices** — Paired iPhones/iPads via `devicectl`: copy the UDID, install `.app` / `.ipa` (drag & drop), launch by bundle ID, open a custom-scheme or universal link in the app, and export screenshots or crash logs to the Desktop
 - **Signing & Profiles** — Provisioning profiles (type, bundle ID, team, devices, entitlements, expiry) cross-checked against the signing certificates in your keychain; trash expired profiles in one click
-- **Push Notification Tester** — Send payloads to a booted simulator, or to a real device through APNs (token-based `.p8` auth, sandbox / production, readable error reasons); saved payload library and "resend last"
+- **Push Notification Tester** — Send simple, rich, silent or custom JSON payloads to a booted simulator, or to a real device through APNs (token-based `.p8` auth, sandbox / production, readable error reasons); save named payloads and resend the last one
 - **Deep Link Launcher** — Test custom URL schemes and universal links with recent-URL history
 - **Universal Link Validator** — Fetches a domain's `apple-app-site-association` from your server and Apple's CDN, checks status / content type / size / redirects / JSON / app IDs, and tells you which app (if any) a given URL opens and by which rule
 - **Simulator Recorder** — Records the simulator screen to MP4/HEVC on the Desktop with a live timer; turn any recording into a looping GIF; toggle Simulator touch indicators
 - **Design Overlay** — Lays a design export semi-transparently over the Simulator window (click-through), with a layout grid, snap-to-Simulator and 1 pt nudging
-- **Physical Devices** — also opens deep links / universal links in an app on the device (`devicectl … --payload-url`)
 - **App Store Connect** — Recent builds and their processing state through the App Store Connect API, with a notification when a build is ready in TestFlight
 - **Apple Developer Status** — APNs, App Store Connect, TestFlight, notary service… current incidents from Apple's system status feed
-- **Network Lab** — A local proxy that logs HTTP requests in full and HTTPS as host + bytes (optionally routing the Mac and Simulators through it), and a mock API server with per-route method, path patterns, status, delay, headers and body
+- **Network Lab** — A local proxy that logs HTTP requests, status, timing and byte counts; HTTPS tunnels show host and byte counts, without decrypting content. Point a client at the proxy or route the Mac and Simulators through it. The mock API server has editable method, path patterns, status, delay, headers and body, with a request log
 - **Network Link Conditioner** — Throttle the Mac's default route (and therefore the iOS Simulator) via `dnctl` + `pfctl` (dummynet). Presets: Off / Edge / 3G / DSL / LTE / 5% Loss / 100% Loss, each tile shows target bandwidth + delay. First use writes `/etc/sudoers.d/swordfish-throttle` so later toggles run silently.
-- **Color Picker** — System eyedropper (`NSColorSampler`), editable HEX field, recent-color history, and one-click copy rows for Swift (`UIColor` / `Color`), UIKit (RGBA), and CSS snippets
+- **Color Picker** — System eyedropper (`NSColorSampler`), editable HEX field, copyable RGB and HSL values, recent-color history, and one-click copy rows for SwiftUI, UIKit and CSS snippets
 
 ### JSON
 - **JSON Viewer** — Dedicated window: raw editor on the left, a native tree (`List` + `OutlineGroup` = `NSOutlineView` under the hood) on the right. Paste, Format, Minify, Sort Keys, with parse-error line/column reporting.
 - **JSON to Struct** — Generates Swift Codable structs from a JSON sample with toggles for `Codable` conformance and snake_case → camelCase mapping (auto-generated `CodingKeys`).
 
 ### Dev Utilities (window)
-- JWT decoder (with `exp` / `iat` readout), Unix ↔ ISO 8601 timestamps, Base64 / base64url, URL encode / decode + component breakdown, cURL → `URLRequest` code (and request → cURL), UUID generator, Plist ↔ JSON, MD5 / SHA hashes — all local
+- JWT decoder (header, payload and `exp` / `iat` readout; **does not verify signatures**), Unix seconds/milliseconds/microseconds ↔ ISO 8601 timestamps, Base64 / base64url, URL encode / decode + component breakdown, cURL → `URLRequest` code (and request → cURL), UUID v4 generator, Plist ↔ JSON, MD5 / SHA hashes — all local
 - **SF Symbols** browser (search, rendering modes, copy name / SwiftUI / UIKit), **App Icon** generator (one 1024 px image → `AppIcon.appiconset` for iOS / macOS / watchOS), **Localization Check** (per-language coverage and missing keys of every `.xcstrings` in a project, CSV export)
 - **Color Picker** also shows WCAG contrast against white, black or any color, with AA / AAA results
 
@@ -61,27 +68,28 @@ Swordfish is a native SwiftUI + AppKit menu bar app that consolidates the tools 
 - **Displays** — DDC/CI brightness slider for external monitors (`IOAVService`) plus built-in brightness (`DisplayServices.framework`)
 - **Anti-Sleep** — Caffeine-style sleep prevention with an in-place duration picker (∞ / 15m / 1h / 2h / 5h), live countdown, and absolute end time
 - **Lid-Closed Mode** — Keeps the Mac awake even with the lid closed (`pmset -a disablesleep`). One-time admin prompt writes a sudoers entry scoped to exactly the two pmset commands; sleep is restored automatically when Swordfish quits.
-- **Quick Toggles** — Dark Mode, show hidden files in Finder, and default audio output / input device pickers (CoreAudio)
+- **Quick Toggles** — Dark Mode, show hidden files in Finder, mute/unmute the default microphone when supported, and choose default audio output / input devices (CoreAudio)
 - **Hardware monitor** — CPU temperature (Apple Silicon IOHID sensors), fan RPM (SMC), 12-sample sparklines, threshold-colored bars, plus a thermal-pressure badge when macOS starts throttling
 - **CPU / GPU load** — Overall and per-core CPU utilisation (`host_processor_info`) and GPU utilisation (IOAccelerator performance statistics)
-- **Memory & Storage** — Live stats via `host_statistics64` + `URL.resourceValues`, with app/wired/cache/free breakdown
+- **Memory & Storage** — Live stats via `host_statistics64` + `URL.resourceValues`, with app/wired/cache/free memory breakdown and used/free volume capacity
 - **Network** — Live download / upload rate with sparklines, active interface, local IP and VPN indicator
 - **Battery** — Charge, time remaining, health (full-charge vs. design capacity), cycle count, temperature and adapter wattage; connected AirPods / Magic accessories' battery levels
-- **Processes** — Top processes by CPU or memory with quit / force quit, a dev-tools memory summary, listening TCP ports (open in browser, copy, quit the owner), and one-click restarts for SourceKit, CoreSimulator and the Xcode build service
+- **Processes** — Top processes by CPU or memory with quit / force quit for your own processes, a dev-tools memory summary, listening TCP ports for your user (open in browser, copy, quit the owner), and one-click restarts for SourceKit, CoreSimulator and the Xcode build service
 
 ### Clipboard
-- **History** — Text, links, code, images and files; searchable, pinnable, filterable (All/Text/Links/Code/Media), shows the source app; kept across launches (20–500 items, configurable)
+- **History** — Text, links, code, images and files; searchable, pinnable, filterable (All/Text/Links/Code/Media), shows the source app; optional persistence across launches and a configurable 20–500 unpinned item limit
 - **Privacy** — Copies marked private by password managers (`org.nspasteboard.ConcealedType` / `TransientType`) are never recorded; per-app exclusion list (1Password, Bitwarden, Keychain Access… by default); tokens and API keys (JWT, `sk-…`, `ghp_…`, `AKIA…`, PEM keys) are masked, kept in memory only, and deleted after 2 minutes
 - **Smart actions** — JSON → JSON Viewer, JWT → decoder, Unix timestamp → date, Base64 → decoded text, deep link → open in booted Simulator, HEX → color swatch + SwiftUI / UIColor; plus transforms (trim, case, camelCase / snake_case, sort / dedupe lines, JSON escape / unescape)
-- **Quick paste panel** — Global hotkey (⌃⌘V by default, configurable) opens a Spotlight-style history panel over any app: search, ↑↓, ↩ to paste (with Accessibility permission), ⌘1–9 quick pick
-- **Quick Actions** — Screenshot, Lock Screen (⌃⌘Q via System Events), Flush DNS (admin prompt), Terminal
+- **Quick paste panel** — Global hotkey (⌃⌘V by default, configurable) opens a Spotlight-style history panel over any app: search, ↑↓, ↩ to paste (with Accessibility permission), ⌘1–9 quick pick. Without Accessibility permission, ↩ copies the item so you can paste manually
+- **Quick Actions** — Interactive screenshot to the clipboard, Lock Screen (⌃⌘Q via System Events), Flush DNS (admin prompt), and open Terminal
 
 ### App-level
 - **Settings window** (gear menu → Settings…, ⌘,) —
   - **General**: in-app language picker (System Default / English / Türkçe, with one-click relaunch), Launch at Login (`SMAppService`), version info
   - **Monitoring**: optional live value next to the menu bar icon (CPU temperature / load, memory, network speed) and notifications for CPU temperature, low disk space, critical memory pressure and thermal throttling (30-minute cooldown per alert)
+  - **Clipboard**: keep history after quitting, set the unpinned history limit, choose the Quick Paste shortcut, request Accessibility access, and manage apps excluded from capture
   - **Developer Keys**: APNs and App Store Connect API keys (IDs in preferences, `.p8` private keys in the Keychain)
-  - **Permissions**: live status of everything features depend on — Screen Recording, Automation (System Events), the two sudoers helpers (Lid-Closed Mode, Network Link Conditioner), and Xcode Developer Tools (`simctl`) — with Request / Open System Settings shortcuts and a copyable `xcode-select` fix when developer tools are missing
+  - **Permissions**: status and setup for Screen Recording, Automation (System Events), the two sudoers helpers (Lid-Closed Mode, Network Link Conditioner), and Xcode Developer Tools (`simctl`), with Request / Open System Settings shortcuts and a copyable `xcode-select` fix when developer tools are missing. Clipboard Accessibility is managed in the Clipboard settings; notification authorization is shown in Monitoring
 - **Launch at Login** — Also toggleable directly from the gear menu
 - **Localization** — English, Turkish, Spanish, French, Serbian (Cyrillic & Latin), and Japanese via a String Catalog (`Localizable.xcstrings`); follows the system language or the in-app override
 
@@ -98,7 +106,9 @@ Swordfish asks for these on first use. Everything is optional — features that 
 
 | Permission | Used by |
 |---|---|
-| Automation → System Events | Lock Screen (⌃⌘Q shortcut synthesis) |
+| Automation → System Events / Xcode | Lock Screen (⌃⌘Q shortcut synthesis) and Clean Build in the active Xcode workspace |
+| Accessibility | Direct paste from the Quick Paste panel; without it, selecting an item copies it for manual paste |
+| Notifications | Build and TestFlight completion notices, plus enabled monitoring alerts |
 | Admin privileges (one-time auth prompt) | Flush DNS (`dscacheutil` + `killall -HUP mDNSResponder`) |
 | Admin privileges (one-time, writes a sudoers entry) | Network Link Conditioner — grants `NOPASSWD` for `/usr/sbin/dnctl` and `/sbin/pfctl` so later toggles don't prompt. Removed when the helper is uninstalled from the ••• menu. |
 | Admin privileges (one-time, writes a sudoers entry) | Lid-Closed Mode — grants `NOPASSWD` for exactly `pmset -a disablesleep 1/0`. Removed via right-click → "Remove helper & restore sleep". |
@@ -110,14 +120,14 @@ Swordfish asks for these on first use. Everything is optional — features that 
 - **Apple Silicon** for the full feature set — CPU temperature reading uses the Apple Silicon IOHID sensor surface
 - **Intel Macs**: SMC-based temperatures, fan speeds, and all non-hardware features still work; the IOHID temperature path returns nil and the UI falls back accordingly
 
-Xcode command-line tools (`xcrun simctl`) are required for Simulator features.
+Xcode command-line tools (`xcrun simctl`) are required for Simulator features, and `xcrun devicectl` is used for paired physical devices. The Xcode Releases panel can install Xcode with the optional [`xcodes` CLI](https://github.com/XcodesOrg/xcodes); release and status feeds, App Store Connect, APNs and Universal Link checks require network access.
 
 ## Building from Source
 
 Requirements:
 - Xcode 15 or later
 - Swift 5.9
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) 2.35 or later: `brew install xcodegen`
 
 ```bash
 git clone https://github.com/akkanferhan/Swordfish.git
@@ -126,7 +136,7 @@ xcodegen generate
 open Swordfish.xcodeproj
 ```
 
-Run via `⌘R`. First build takes ~30 seconds; incremental builds are fast.
+Run via `⌘R` in Xcode.
 
 Set `SWORDFISH_MOCK_SENSORS=1` in the scheme environment to use simulated CPU/fan values (useful when working on the hardware tiles without touching real sensors).
 
@@ -138,28 +148,51 @@ App/
   AppDelegate.swift         — NSStatusItem + NSPopover owner, PopoverController
   AppEnvironment.swift      — dependency wiring
 
-Services/                   — ObservableObjects, one per feature domain
-  SystemMonitor.swift       — 2s polling of all hardware + memory + disk
+Services/                   — state and operations for each feature domain
+  SystemMonitor.swift       — hardware, memory, disk and network polling
+  SystemSamplers.swift      — CPU, GPU, battery and network samples
   HardwareSensors.swift     — IOHIDEventSystemClient + SMC wrappers
-  MemoryStats.swift         — host_statistics64 wrapper (app / wired / cache)
-  DiskStats.swift           — URL.resourceValues-based volume capacity
-  DisplayController.swift   — CGDisplay enumeration, brightness debounce
-  DisplayBrightness.swift   — DisplayServices (dlopen) + IOAVService DDC/CI
+  DisplayController.swift   — display enumeration and brightness control
   CaffeineService.swift     — IOPMAssertion-based anti-sleep
-  ClipboardService.swift    — NSPasteboard changeCount polling
+  LidSleepService.swift     — lid-closed mode and its helper
+  QuickTogglesService.swift — appearance, Finder and CoreAudio controls
+  ProcessMonitor.swift      — processes, listening ports and dev daemon restarts
+  ClipboardService.swift    — pasteboard history and persistence
+  ClipboardSupport.swift    — privacy detection and content classification
   SimulatorService.swift    — xcrun simctl wrapper
+  SimulatorToolbox.swift    — simulator status, privacy, media, apps and device actions
+  SimulatorDefaults.swift   — simulator app UserDefaults access
+  SimulatorLogService.swift — unified log streaming
+  PhysicalDeviceService.swift — xcrun devicectl wrapper
+  DevCleanupService.swift   — developer disk cleanup
+  BuildMonitor.swift        — build history and completion notifications
+  XcodeVersionsService.swift — installed Xcode discovery and switching
   NetworkThrottleService.swift — dnctl + pfctl dummynet, sudoers helper
+  NetworkLab.swift          — traffic proxy and mock server
+  AppleAPIKeys.swift        — Keychain storage and APNs token creation
+  AppStoreConnect.swift     — App Store Connect build status
+  SigningService.swift      — profiles and certificates
+  CrashSymbolicator.swift   — crash report and dSYM matching
+  UniversalLinkValidator.swift — AASA inspection and URL matching
+  DevUtilities.swift       — local encoders, decoders and generators
+  DevUtilitiesExtras.swift — cURL, app icon and localization helpers
+  AlertService.swift        — monitoring alerts
   LoginItemManager.swift    — SMAppService
   JSONToSwift.swift         — recursive Swift struct generator
-  DevToolsState.swift       — shared state across DevKit tools (picked color, etc.)
+  DevToolsState.swift       — shared state across Dev Kit tools
 
 Views/
   Popover/                  — status-item popover shell
-  SystemHub/                — displays, anti-sleep, hardware tiles
-  DevKit/                   — Xcode tools + simulator + launch rows
-  Productivity/             — clipboard + quick actions
+  SystemHub/                — displays, sleep, audio, hardware and processes
+  DevKit/                   — Xcode, Simulator, devices, network and tooling
+  Productivity/             — clipboard history + quick actions
+  QuickPaste/               — global search and paste panel
   JSONViewer/               — standalone JSON Viewer window
   JSONToSwift/              — standalone Struct Generator window
+  DevUtilities/             — conversion and asset tools window
+  SimulatorLogs/            — live log window
+  Signing/                  — profiles and certificates window
+  Settings/                 — preferences and permission guidance
   Shared/                   — ExpandableSection, LaunchSection, Sparkline, Badge
 
 DesignSystem/               — Theme, Typography, Spacing, Motion, Radius
@@ -167,7 +200,7 @@ DesignSystem/               — Theme, Typography, Spacing, Motion, Radius
 Utilities/                  — ProcessRunner, AppVersion (Bundle helpers)
 ```
 
-Services are the source of truth. Views never talk to IOKit or shell directly — they go through the corresponding service, which makes mocking and unit testing straightforward.
+`AppEnvironment` wires shared services into the popover and standalone windows. Feature-specific views own local presentation state and call their corresponding services or system tools.
 
 ## Private APIs
 
