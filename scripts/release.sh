@@ -8,7 +8,7 @@
 #   3. brew install xcodegen create-dmg
 #
 # Usage:
-#   scripts/release.sh                       # defaults below
+#   scripts/release.sh                       # reads VERSION at the repo root
 #   TEAM_ID=... KEYCHAIN_PROFILE=... scripts/release.sh
 #
 set -euo pipefail
@@ -17,10 +17,10 @@ set -euo pipefail
 TEAM_ID="${TEAM_ID:-43THU6L26P}"
 SIGNING_IDENTITY="${SIGNING_IDENTITY:-Developer ID Application}"
 KEYCHAIN_PROFILE="${KEYCHAIN_PROFILE:-swordfish}"
-VERSION="${VERSION:-1.1}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+VERSION="${VERSION:-$(<"$REPO_ROOT/VERSION")}"
 PROJ_DIR="$REPO_ROOT/Swordfish"
 BUILD_DIR="$REPO_ROOT/build"
 ARCHIVE_PATH="$BUILD_DIR/Swordfish.xcarchive"
@@ -162,5 +162,5 @@ spctl -a -vv --type open --context context:primary-signature "$DMG_PATH" 2>&1 | 
 
 printf "\n\033[1;32m🎣  Release ready:\033[0m  %s\n" "$DMG_PATH"
 printf "   size: %s\n" "$(du -h "$DMG_PATH" | awk '{print $1}')"
-printf "   next: gh release create v%s \"%s\" --title 'Swordfish %s' --notes-file RELEASE_NOTES.md\n" \
-    "$VERSION" "$DMG_PATH" "$VERSION"
+printf "   next: gh release create v%s \"%s\" --title 'Swordfish %s' --notes-file RELEASE_NOTES_%s.md\n" \
+    "$VERSION" "$DMG_PATH" "$VERSION" "$VERSION"

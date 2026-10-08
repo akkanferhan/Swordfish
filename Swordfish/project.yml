@@ -43,8 +43,8 @@ targets:
         CFBundleDevelopmentRegion: en
         CFBundleName: Swordfish
         CFBundleDisplayName: Swordfish
-        CFBundleShortVersionString: "1.3"
-        CFBundleVersion: "4"
+        CFBundleShortVersionString: "1.4"
+        CFBundleVersion: "5"
         LSUIElement: true
         LSMinimumSystemVersion: "13.0"
         NSHighResolutionCapable: true
