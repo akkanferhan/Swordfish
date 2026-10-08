@@ -1,11 +1,17 @@
 import SwiftUI
 import AppKit
+import AVFoundation
+import ImageIO
+import UniformTypeIdentifiers
 
 struct SimulatorRecorderView: View {
     @StateObject private var service = SimulatorService()
     @StateObject private var recorder = SimulatorRecorder()
     @AppStorage("swordfish.recorder.format") private var format: Format = .mp4
     @State private var selectedUDID: String = ""
+    @State private var showTouches = SimulatorTouches.isEnabled
+    @State private var gifStatus: ToolboxStatus?
+    @State private var isMakingGIF = false
 
     enum Format: String, CaseIterable, Identifiable {
         case mp4, mov
@@ -17,6 +23,8 @@ struct SimulatorRecorderView: View {
             targetRow
             controlRow
             if let status = recorder.status { statusLine(status) }
+            if let gifStatus { ToolboxStatusLine(status: gifStatus) }
+            extrasRow
         }
         .task { service.refresh() }
     }
@@ -139,6 +147,16 @@ struct SimulatorRecorderView: View {
             if case .saved(let url) = status {
                 Spacer()
                 Button {
+                    makeGIF(from: url)
+                } label: {
+                    Text("Make GIF")
+                        .font(Typography.monoSmall)
+                        .foregroundStyle(Color.accentColor)
+                        .underline()
+                }
+                .buttonStyle(.plain)
+                .disabled(isMakingGIF)
+                Button {
                     NSWorkspace.shared.activateFileViewerSelecting([url])
                 } label: {
                     Text("Reveal in Finder")
@@ -150,6 +168,52 @@ struct SimulatorRecorderView: View {
             }
         }
         .foregroundStyle(status.isError ? Theme.Semantic.danger : Theme.Semantic.ok)
+    }
+
+    // MARK: - Extras (touches, GIF)
+
+    private var extrasRow: some View {
+        HStack(spacing: Spacing.sm) {
+            Toggle("Show touches", isOn: Binding(
+                get: { showTouches },
+                set: { on in
+                    SimulatorTouches.setEnabled(on)
+                    showTouches = on
+                }
+            ))
+            .toggleStyle(.checkbox)
+            .font(Typography.monoSmall)
+            .help("Draws touch circles in the Simulator window (applies after Simulator restarts). They appear in window / screen recordings such as ⇧⌘5 — simctl captures the device screen only.")
+            Spacer()
+            PillButton(title: isMakingGIF ? "Making GIF…" : "Video → GIF…", symbol: "photo.stack") {
+                chooseVideoForGIF()
+            }
+            .disabled(isMakingGIF)
+        }
+    }
+
+    private func chooseVideoForGIF() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie]
+        if case .saved(let url) = recorder.status {
+            panel.directoryURL = url.deletingLastPathComponent()
+        }
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        makeGIF(from: url)
+    }
+
+    private func makeGIF(from url: URL) {
+        isMakingGIF = true
+        gifStatus = nil
+        Task {
+            do {
+                let gif = try await GIFMaker.convert(url)
+                gifStatus = .ok(String(localized: "Saved \(gif.lastPathComponent)"), gif)
+            } catch {
+                gifStatus = .error(error.localizedDescription)
+            }
+            isMakingGIF = false
+        }
     }
 
     // MARK: - Actions
@@ -278,5 +342,66 @@ final class SimulatorRecorder: ObservableObject {
     private func tick() {
         guard let started = startedAt else { return }
         elapsed = Date().timeIntervalSince(started)
+    }
+}
+
+// MARK: - Touch indicators
+
+/// Simulator.app's hidden "show single touches" preference.
+enum SimulatorTouches {
+    private static let domain = "com.apple.iphonesimulator" as CFString
+    private static let key = "ShowSingleTouches" as CFString
+
+    static var isEnabled: Bool {
+        CFPreferencesAppSynchronize(domain)
+        return (CFPreferencesCopyAppValue(key, domain) as? Bool) ?? false
+    }
+
+    static func setEnabled(_ on: Bool) {
+        CFPreferencesSetAppValue(key, NSNumber(value: on), domain)
+        CFPreferencesAppSynchronize(domain)
+    }
+}
+
+// MARK: - GIF export
+
+/// Turns a screen recording into a looping GIF next to it (12 fps, at most
+/// 480 px wide — small enough for PR descriptions and Slack).
+enum GIFMaker {
+    static func convert(_ video: URL, fps: Double = 12, maxWidth: CGFloat = 480) async throws -> URL {
+        let asset = AVURLAsset(url: video)
+        let duration = try await asset.load(.duration).seconds
+        guard duration.isFinite, duration > 0 else {
+            throw SimulatorToolbox.CommandError(message: String(localized: "Couldn't read the video"))
+        }
+        let frameCount = min(Int(duration * fps), 600)   // cap at ~50 s of GIF
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.maximumSize = CGSize(width: maxWidth, height: maxWidth * 4)
+        generator.requestedTimeToleranceBefore = CMTime(value: 1, timescale: 60)
+        generator.requestedTimeToleranceAfter = CMTime(value: 1, timescale: 60)
+
+        let output = video.deletingPathExtension().appendingPathExtension("gif")
+        guard let destination = CGImageDestinationCreateWithURL(output as CFURL, UTType.gif.identifier as CFString,
+                                                                 frameCount, nil) else {
+            throw SimulatorToolbox.CommandError(message: String(localized: "Couldn't create the GIF file"))
+        }
+        let fileProperties: [String: Any] = [
+            kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFLoopCount as String: 0],
+        ]
+        CGImageDestinationSetProperties(destination, fileProperties as CFDictionary)
+        let frameProperties: [String: Any] = [
+            kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFDelayTime as String: 1.0 / fps],
+        ]
+
+        for index in 0..<frameCount {
+            let time = CMTime(seconds: Double(index) / fps, preferredTimescale: 600)
+            let (image, _) = try await generator.image(at: time)
+            CGImageDestinationAddImage(destination, image, frameProperties as CFDictionary)
+        }
+        guard CGImageDestinationFinalize(destination) else {
+            throw SimulatorToolbox.CommandError(message: String(localized: "Couldn't write the GIF"))
+        }
+        return output
     }
 }

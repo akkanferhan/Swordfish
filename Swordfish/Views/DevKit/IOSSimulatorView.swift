@@ -3,10 +3,18 @@ import SwiftUI
 struct IOSSimulatorView: View {
     @StateObject private var service = SimulatorService()
     @State private var pendingDeleteUDID: String?
+    @State private var showingCreate = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             bulkActions
+
+            if showingCreate {
+                CreateSimulatorForm(service: service) { showingCreate = false }
+            }
+            if let message = service.lastMessage {
+                ToolboxStatusLine(status: .ok(message, nil))
+            }
 
             if let error = service.lastError, !service.simulators.isEmpty {
                 errorBanner(error)
@@ -50,6 +58,9 @@ struct IOSSimulatorView: View {
         HStack(spacing: Spacing.sm) {
             PillButton(title: "Open Simulator", symbol: "iphone", action: service.openSimulatorApp)
             PillButton(title: "Shutdown All", symbol: "power", action: service.shutdownAll)
+            PillButton(title: "New", symbol: "plus") {
+                withAnimation(Motion.fast) { showingCreate.toggle() }
+            }
             Spacer()
             Button(action: service.refresh) {
                 Image(systemName: "arrow.clockwise")
@@ -87,7 +98,10 @@ struct IOSSimulatorView: View {
                             onToggleBootState: {
                                 sim.isBooted ? service.shutdown(sim) : service.boot(sim)
                             },
-                            onDeleteRequest: { requestDelete(sim) }
+                            onDeleteRequest: { requestDelete(sim) },
+                            onRename: { service.rename(sim, to: $0) },
+                            onClone: { service.clone(sim) },
+                            onErase: { service.erase(sim) }
                         )
                     }
                 }
@@ -151,8 +165,14 @@ private struct SimulatorRow: View {
     let pendingAction: SimulatorService.PendingAction?
     let onToggleBootState: () -> Void
     let onDeleteRequest: () -> Void
+    let onRename: (String) -> Void
+    let onClone: () -> Void
+    let onErase: () -> Void
 
     @State private var hovering = false
+    @State private var renaming = false
+    @State private var newName = ""
+    @State private var confirmingErase = false
 
     private var isPendingBootChange: Bool { pendingAction != nil }
 
@@ -164,10 +184,21 @@ private struct SimulatorRow: View {
                 .frame(width: 18)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(sim.name)
-                    .font(Typography.bodyMedium)
-                    .foregroundStyle(Theme.TextColor.primary)
-                    .lineLimit(1)
+                if renaming {
+                    TextField("Name", text: $newName)
+                        .textFieldStyle(.roundedBorder)
+                        .font(Typography.bodyMedium)
+                        .onSubmit {
+                            onRename(newName)
+                            renaming = false
+                        }
+                        .onExitCommand { renaming = false }
+                } else {
+                    Text(sim.name)
+                        .font(Typography.bodyMedium)
+                        .foregroundStyle(Theme.TextColor.primary)
+                        .lineLimit(1)
+                }
                 HStack(spacing: 6) {
                     Text(sim.runtime)
                         .font(Typography.monoSmall)
@@ -181,7 +212,16 @@ private struct SimulatorRow: View {
             }
             Spacer(minLength: 0)
 
-            if hovering || sim.isBooted || isPendingDelete || isPendingBootChange {
+            if confirmingErase {
+                Text("Erase all content?")
+                    .font(Typography.monoSmall)
+                    .foregroundStyle(Theme.Semantic.danger)
+                ActionButton(symbol: "xmark", tint: Theme.TextColor.tertiary) { confirmingErase = false }
+                ActionButton(symbol: "checkmark", tint: Theme.Semantic.danger) {
+                    confirmingErase = false
+                    onErase()
+                }
+            } else if hovering || sim.isBooted || isPendingDelete || isPendingBootChange {
                 HStack(spacing: 4) {
                     ActionButton(
                         symbol: sim.isBooted ? "stop.fill" : "play.fill",
@@ -197,6 +237,23 @@ private struct SimulatorRow: View {
                     )
                 }
             }
+
+            Menu {
+                Button("Rename…") {
+                    newName = sim.name
+                    renaming = true
+                }
+                Button("Clone") { onClone() }
+                Divider()
+                Button("Erase Content & Settings…") { confirmingErase = true }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.TextColor.tertiary)
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
         }
         .padding(.horizontal, Spacing.sm)
         .padding(.vertical, 6)
@@ -257,5 +314,67 @@ private struct ActionButton: View {
         .buttonStyle(.plain)
         .disabled(isLoading)
         .onHover { hovering = $0 }
+    }
+}
+
+// MARK: - Create form
+
+private struct CreateSimulatorForm: View {
+    @ObservedObject var service: SimulatorService
+    let close: () -> Void
+    @State private var runtimes: [SimulatorService.Runtime] = []
+    @State private var runtime: SimulatorService.Runtime?
+    @State private var deviceType: SimulatorService.DeviceType?
+    @State private var name = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            if runtimes.isEmpty {
+                Text("Loading runtimes…")
+                    .font(Typography.monoSmall)
+                    .foregroundStyle(Theme.TextColor.tertiary)
+            } else {
+                HStack(spacing: Spacing.sm) {
+                    Picker("", selection: $runtime) {
+                        ForEach(runtimes) { rt in Text(rt.name).tag(Optional(rt)) }
+                    }
+                    .labelsHidden()
+                    .frame(width: 130)
+                    Picker("", selection: $deviceType) {
+                        ForEach(runtime?.deviceTypes ?? []) { dt in Text(dt.name).tag(Optional(dt)) }
+                    }
+                    .labelsHidden()
+                }
+                HStack(spacing: Spacing.sm) {
+                    TextField("Name", text: $name)
+                        .textFieldStyle(.roundedBorder)
+                        .font(Typography.mono)
+                    PillButton(title: "Cancel", symbol: "xmark", action: close)
+                    AccentActionButton(title: "Create", symbol: "plus",
+                                       enabled: runtime != nil && deviceType != nil && !name.isEmpty) {
+                        if let runtime, let deviceType {
+                            service.create(name: name, deviceType: deviceType, runtime: runtime)
+                            close()
+                        }
+                    }
+                }
+            }
+        }
+        .padding(Spacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
+                .strokeBorder(Color.accentColor.opacity(0.5), lineWidth: 1)
+        )
+        .task {
+            runtimes = await Task.detached(priority: .userInitiated) { SimulatorService.availableRuntimes() }.value
+            runtime = runtimes.first
+        }
+        .onChange(of: runtime) { rt in
+            // Prefer the newest iPhone of the selected runtime.
+            deviceType = rt?.deviceTypes.last { $0.name.hasPrefix("iPhone") } ?? rt?.deviceTypes.first
+        }
+        .onChange(of: deviceType) { dt in
+            if let dt { name = dt.name }
+        }
     }
 }

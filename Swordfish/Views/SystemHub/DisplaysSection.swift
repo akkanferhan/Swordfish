@@ -4,11 +4,11 @@ struct DisplaysSection: View {
     @EnvironmentObject var controller: DisplayController
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionTitle(
-                title: "Displays",
-                badge: String(localized: "DDC · \(controller.displays.count) connected")
-            )
+        CollapsibleSection(
+            title: "Displays",
+            badge: String(localized: "DDC · \(controller.displays.count) connected"),
+            id: "displays"
+        ) {
             VStack(spacing: Spacing.sm) {
                 ForEach(controller.displays) { display in
                     DisplayRow(display: display) { value in

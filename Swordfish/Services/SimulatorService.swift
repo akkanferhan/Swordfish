@@ -121,6 +121,81 @@ final class SimulatorService: ObservableObject {
         }
     }
 
+    // MARK: - Create / clone / erase / rename
+
+    struct DeviceType: Identifiable, Hashable {
+        let id: String      // com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro
+        let name: String
+    }
+
+    struct Runtime: Identifiable, Hashable {
+        let id: String      // com.apple.CoreSimulator.SimRuntime.iOS-18-2
+        let name: String    // "iOS 18.2"
+        let deviceTypes: [DeviceType]
+    }
+
+    /// Available runtimes with the device types each supports, newest first.
+    nonisolated static func availableRuntimes() -> [Runtime] {
+        guard let r = try? ProcessRunner.run("/usr/bin/xcrun", arguments: ["simctl", "list", "runtimes", "--json"]),
+              let root = (try? JSONSerialization.jsonObject(with: Data(r.stdout.utf8))) as? [String: Any],
+              let list = root["runtimes"] as? [[String: Any]] else { return [] }
+        return list.compactMap { rt -> Runtime? in
+            guard rt["isAvailable"] as? Bool ?? true,
+                  let id = rt["identifier"] as? String,
+                  let name = rt["name"] as? String else { return nil }
+            let types = (rt["supportedDeviceTypes"] as? [[String: Any]] ?? []).compactMap { dt -> DeviceType? in
+                guard let tid = dt["identifier"] as? String, let tname = dt["name"] as? String else { return nil }
+                return DeviceType(id: tid, name: tname)
+            }
+            return Runtime(id: id, name: name, deviceTypes: types)
+        }
+        .sorted { $0.name.compare($1.name, options: .numeric) == .orderedDescending }
+    }
+
+    func create(name: String, deviceType: DeviceType, runtime: Runtime) {
+        simctlAction(["create", name, deviceType.id, runtime.id],
+                     success: String(localized: "Created \(name)"))
+    }
+
+    func clone(_ sim: Simulator) {
+        let name = String(localized: "\(sim.name) Copy")
+        // simctl can only clone a device that isn't booted.
+        simctlAction(["clone", sim.udid, name], shutdownFirst: sim.isBooted ? sim.udid : nil,
+                     success: String(localized: "Cloned to \(name)"))
+    }
+
+    func rename(_ sim: Simulator, to name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, trimmed != sim.name else { return }
+        simctlAction(["rename", sim.udid, trimmed], success: String(localized: "Renamed to \(trimmed)"))
+    }
+
+    /// "Erase All Content and Settings" — a factory-fresh device, same UDID.
+    func erase(_ sim: Simulator) {
+        simctlAction(["erase", sim.udid], shutdownFirst: sim.isBooted ? sim.udid : nil,
+                     success: String(localized: "Erased \(sim.name)"))
+    }
+
+    @Published var lastMessage: String?
+
+    private func simctlAction(_ args: [String], shutdownFirst: String? = nil, success: String) {
+        lastError = nil
+        lastMessage = nil
+        Task.detached(priority: .userInitiated) {
+            if let udid = shutdownFirst {
+                _ = try? ProcessRunner.run("/usr/bin/xcrun", arguments: ["simctl", "shutdown", udid])
+            }
+            let outcome = Result { try SimulatorToolbox.simctl(args) }
+            await MainActor.run { [weak self] in
+                switch outcome {
+                case .success: self?.lastMessage = success
+                case .failure(let error): self?.lastError = error.localizedDescription
+                }
+                self?.refresh()
+            }
+        }
+    }
+
     func shutdownAll() {
         run(["simctl", "shutdown", "all"])
     }

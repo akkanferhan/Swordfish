@@ -9,8 +9,16 @@ struct HardwareStatsSection: View {
                 CPUTile()
                 FanTile()
             }
+            HStack(spacing: Spacing.sm) {
+                CPULoadTile()
+                GPUTile()
+            }
             MemoryTile()
             DiskTile()
+            NetworkTile()
+            if monitor.battery != nil || !monitor.peripheralBatteries.isEmpty {
+                BatteryTile()
+            }
         }
     }
 }
