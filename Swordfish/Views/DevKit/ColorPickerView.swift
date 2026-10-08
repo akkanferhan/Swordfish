@@ -7,6 +7,7 @@ struct ColorPickerView: View {
     @State private var hexInput: String = ""
     @State private var toast: String?
     @State private var recent: [String] = loadRecent()
+    @AppStorage("swordfish.color.contrastAgainst") private var contrastHex = "#FFFFFF"
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.md) {
@@ -14,6 +15,7 @@ struct ColorPickerView: View {
             formatRows
             if !recent.isEmpty { recentColors }
             snippetRows
+            contrastRows
             pickRow
             if let toast {
                 Text(toast)
@@ -117,6 +119,81 @@ struct ColorPickerView: View {
             CopyableRow(label: String(localized: "UIKit"),   value: uiKitSnippet, mono: true)   { copy(uiKitSnippet, String(localized: "UIKit")) }
             CopyableRow(label: String(localized: "CSS"),     value: cssSnippet, mono: true)     { copy(cssSnippet, String(localized: "CSS")) }
         }
+    }
+
+    // MARK: - Contrast (WCAG 2.x)
+
+    private var contrastRows: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Contrast")
+                .font(Typography.monoSmall)
+                .foregroundStyle(Theme.TextColor.tertiary)
+            contrastRow(label: String(localized: "on White"), against: (1, 1, 1))
+            contrastRow(label: String(localized: "on Black"), against: (0, 0, 0))
+            HStack(spacing: 6) {
+                TextField("#RRGGBB", text: $contrastHex)
+                    .textFieldStyle(.plain)
+                    .font(Typography.mono)
+                    .frame(width: 70)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(RoundedRectangle(cornerRadius: Radius.chip).fill(Theme.Surface.surface1))
+                if let other = Self.rgb(fromHex: contrastHex) {
+                    contrastRow(label: "", against: other)
+                }
+            }
+        }
+    }
+
+    private func contrastRow(label: String, against other: (Double, Double, Double)) -> some View {
+        let ratio = components.map { Self.contrast($0, other) } ?? 1
+        return HStack(spacing: 6) {
+            if !label.isEmpty {
+                Text(label)
+                    .font(Typography.monoSmall)
+                    .foregroundStyle(Theme.TextColor.secondary)
+                    .frame(width: 70, alignment: .leading)
+            }
+            Text("Aa")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(swiftColor)
+                .frame(width: 30, height: 20)
+                .background(RoundedRectangle(cornerRadius: 4)
+                    .fill(Color(.sRGB, red: other.0, green: other.1, blue: other.2, opacity: 1)))
+            Text(String(format: "%.2f:1", ratio))
+                .font(Typography.mono)
+                .foregroundStyle(Theme.TextColor.primary)
+                .frame(width: 60, alignment: .leading)
+            wcagBadge("AA", passed: ratio >= 4.5, large: ratio >= 3)
+            wcagBadge("AAA", passed: ratio >= 7, large: ratio >= 4.5)
+            Spacer(minLength: 0)
+        }
+    }
+
+    /// Normal text needs 4.5 (AA) / 7 (AAA); large text 3 / 4.5.
+    private func wcagBadge(_ level: String, passed: Bool, large: Bool) -> some View {
+        let tint = passed ? Theme.Semantic.ok : (large ? Theme.Semantic.warn : Theme.Semantic.danger)
+        let note = passed ? "" : (large ? String(localized: " large") : " ✕")
+        return Badge(label: level + note, tint: tint)
+            .help(passed ? "Passes for all text sizes" : (large ? "Passes only for large text (18 pt+, or 14 pt bold)" : "Fails"))
+    }
+
+    nonisolated static func contrast(_ a: (r: Double, g: Double, b: Double), _ b: (Double, Double, Double)) -> Double {
+        func channel(_ c: Double) -> Double { c <= 0.04045 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4) }
+        func luminance(_ r: Double, _ g: Double, _ b: Double) -> Double {
+            0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+        }
+        let l1 = luminance(a.r, a.g, a.b)
+        let l2 = luminance(b.0, b.1, b.2)
+        return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
+    }
+
+    nonisolated static func rgb(fromHex raw: String) -> (Double, Double, Double)? {
+        var s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if s.hasPrefix("#") { s.removeFirst() }
+        if s.count == 3 { s = s.map { "\($0)\($0)" }.joined() }
+        guard s.count == 6, let v = UInt32(s, radix: 16) else { return nil }
+        return (Double((v >> 16) & 0xFF) / 255, Double((v >> 8) & 0xFF) / 255, Double(v & 0xFF) / 255)
     }
 
     // MARK: - Pick row

@@ -11,16 +11,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private lazy var jsonViewer = JSONViewerWindowController(devTools: env.devTools)
     private lazy var jsonToSwift = JSONToSwiftWindowController()
     private lazy var settings = SettingsWindowController(env: env)
+    private lazy var devUtilities = DevUtilitiesWindowController(devTools: env.devTools)
+    private lazy var simulatorLogs = SimulatorLogsWindowController()
+    private lazy var signing = SigningWindowController()
+    private var quickPaste: QuickPasteController?
+    private lazy var userDefaultsEditor = UserDefaultsEditorWindowController()
+    private lazy var designOverlay = DesignOverlayController()
+    private lazy var crashSymbolicator = CrashSymbolicatorWindowController()
+    private var networkLabController: NetworkLabWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         env = AppEnvironment.makeDefault()
         setupStatusItem()
         setupPopover()
+        env.alerts.onOpen = { [weak self] in self?.showPopover() }
+        let quickPaste = QuickPasteController(clipboard: env.clipboard)
+        quickPaste.start()
+        self.quickPaste = quickPaste
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         // Don't leave the Mac unable to sleep after Swordfish is gone.
         env?.lidSleep.disableOnQuit()
+        // …or pointing at a proxy that no longer exists.
+        networkLabController?.shutdown()
     }
 
     // MARK: - Status item
@@ -38,6 +52,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.updateIcon() }
             .store(in: &cancellables)
+
+        // The optional metric next to the icon follows every monitor tick
+        // and the Settings → Monitoring picker.
+        env.systemMonitor.objectWillChange
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateMetricTitle() }
+            .store(in: &cancellables)
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateMetricTitle() }
+            .store(in: &cancellables)
+    }
+
+    private func updateMetricTitle() {
+        guard let button = statusItem?.button else { return }
+        let text = MenuBarMetric.current.text(from: env.systemMonitor) ?? ""
+        guard button.title != text else { return }
+        button.imagePosition = text.isEmpty ? .imageOnly : .imageLeading
+        button.attributedTitle = NSAttributedString(string: text, attributes: [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium),
+            .baselineOffset: 0.5,
+        ])
     }
 
     private func updateIcon() {
@@ -65,6 +101,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             .environmentObject(env.clipboard)
             .environmentObject(env.devTools)
             .environmentObject(env.loginItem)
+            .environmentObject(env.alerts)
+            .environmentObject(env.builds)
+            .environmentObject(env.appStoreConnect)
             .environment(\.popoverController, PopoverController(delegate: self))
         popover.contentViewController = NSHostingController(rootView: root)
         self.popover = popover
@@ -103,6 +142,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         settings.show()
     }
 
+    func openDevUtilities() {
+        popover.performClose(nil)
+        devUtilities.show()
+    }
+
+    func openSimulatorLogs() {
+        popover.performClose(nil)
+        simulatorLogs.show()
+    }
+
+    func openSigning() {
+        popover.performClose(nil)
+        signing.show()
+    }
+
+    func openUserDefaultsEditor(udid: String, app: InstalledApp) {
+        popover.performClose(nil)
+        userDefaultsEditor.show(udid: udid, app: app)
+    }
+
+    func openDesignOverlay() {
+        popover.performClose(nil)
+        designOverlay.show()
+    }
+
+    func openCrashSymbolicator() {
+        popover.performClose(nil)
+        crashSymbolicator.show()
+    }
+
+    func openNetworkLab() {
+        popover.performClose(nil)
+        let controller = networkLabController ?? NetworkLabWindowController()
+        networkLabController = controller
+        controller.show()
+    }
+
     /// Temporarily suspends the popover's auto-close behavior (for modal
     /// interactions like NSColorSampler). Returns a token to restore it.
     func suspendAutoClose() -> PopoverBehaviorGuard {
@@ -127,6 +203,13 @@ struct PopoverController {
     func openJSONViewer() { delegate.openJSONViewer() }
     func openJSONToSwift() { delegate.openJSONToSwift() }
     func openSettings() { delegate.openSettings() }
+    func openDevUtilities() { delegate.openDevUtilities() }
+    func openSimulatorLogs() { delegate.openSimulatorLogs() }
+    func openSigning() { delegate.openSigning() }
+    func openUserDefaultsEditor(udid: String, app: InstalledApp) { delegate.openUserDefaultsEditor(udid: udid, app: app) }
+    func openDesignOverlay() { delegate.openDesignOverlay() }
+    func openCrashSymbolicator() { delegate.openCrashSymbolicator() }
+    func openNetworkLab() { delegate.openNetworkLab() }
 }
 
 @MainActor

@@ -21,11 +21,13 @@ final class SettingsWindowController: NSObject {
             rootView: SettingsView()
                 .environmentObject(env.loginItem)
                 .environmentObject(env.lidSleep)
+                .environmentObject(env.alerts)
+                .environmentObject(env.clipboard)
         )
         let window = NSWindow(contentViewController: hosting)
         window.title = String(localized: "Settings")
-        window.setContentSize(NSSize(width: 520, height: 540))
-        window.contentMinSize = NSSize(width: 500, height: 460)
+        window.setContentSize(NSSize(width: 680, height: 600))
+        window.contentMinSize = NSSize(width: 660, height: 460)
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.isReleasedWhenClosed = false
         window.center()

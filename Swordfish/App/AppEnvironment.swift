@@ -12,6 +12,9 @@ final class AppEnvironment: ObservableObject {
     let clipboard: ClipboardService
     let devTools: DevToolsState
     let loginItem: LoginItemManager
+    let alerts: AlertService
+    let builds: BuildMonitor
+    let appStoreConnect: AppStoreConnectMonitor
 
     @Published var selectedTab: PopoverTab = .systemHub
 
@@ -22,7 +25,10 @@ final class AppEnvironment: ObservableObject {
         lidSleep: LidSleepService,
         clipboard: ClipboardService,
         devTools: DevToolsState,
-        loginItem: LoginItemManager
+        loginItem: LoginItemManager,
+        alerts: AlertService,
+        builds: BuildMonitor,
+        appStoreConnect: AppStoreConnectMonitor
     ) {
         self.systemMonitor = systemMonitor
         self.displayController = displayController
@@ -31,6 +37,9 @@ final class AppEnvironment: ObservableObject {
         self.clipboard = clipboard
         self.devTools = devTools
         self.loginItem = loginItem
+        self.alerts = alerts
+        self.builds = builds
+        self.appStoreConnect = appStoreConnect
     }
 
     static func makeDefault() -> AppEnvironment {
@@ -46,9 +55,21 @@ final class AppEnvironment: ObservableObject {
         let clipboard = ClipboardService()
         let devTools = DevToolsState()
         let loginItem = LoginItemManager()
+        let alerts = AlertService(monitor: monitor)
+        let builds = BuildMonitor()
+        builds.onFinished = { [weak alerts] record, slower in
+            alerts?.announceBuild(record, slowerThanUsual: slower)
+        }
+        let appStoreConnect = AppStoreConnectMonitor()
+        appStoreConnect.onStateChange = { [weak alerts] build, previous in
+            alerts?.announceASC(build, previous: previous)
+        }
 
         monitor.start()
         clipboard.start()
+        alerts.start()
+        builds.start()
+        appStoreConnect.start()
 
         return AppEnvironment(
             systemMonitor: monitor,
@@ -57,7 +78,10 @@ final class AppEnvironment: ObservableObject {
             lidSleep: lidSleep,
             clipboard: clipboard,
             devTools: devTools,
-            loginItem: loginItem
+            loginItem: loginItem,
+            alerts: alerts,
+            builds: builds,
+            appStoreConnect: appStoreConnect
         )
     }
 }

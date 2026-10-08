@@ -10,7 +10,25 @@ final class SystemMonitor: ObservableObject {
     @Published private(set) var memory: MemoryStats = .zero
     @Published private(set) var disk: DiskStats = .zero
 
+    @Published private(set) var cpuLoad: Double = 0            // 0…1
+    @Published private(set) var cpuCoreLoads: [Double] = []
+    @Published private(set) var cpuLoadHistory: [Double] = []
+    @Published private(set) var gpuLoad: Double?               // 0…1, nil if unavailable
+    @Published private(set) var gpuLoadHistory: [Double] = []
+    @Published private(set) var thermalState: ProcessInfo.ThermalState = .nominal
+
+    @Published private(set) var network: NetworkStats = .zero
+    @Published private(set) var downHistory: [Double] = []
+    @Published private(set) var upHistory: [Double] = []
+
+    @Published private(set) var battery: BatteryStats?
+    @Published private(set) var peripheralBatteries: [PeripheralBattery] = []
+
     let sensors: HardwareSensorService
+    private let cpuSampler = CPULoadSampler()
+    private let networkSampler = NetworkSampler()
+    private var tickCount = 0
+    private var isReadingPeripherals = false
     private var timer: Timer?
     private let historyLimit = 12
     private let pollInterval: TimeInterval = 2.0
@@ -68,6 +86,36 @@ final class SystemMonitor: ObservableObject {
         append(&fanHistory, Double(f))
         memory = MemoryStats.current()
         disk = DiskStats.current()
+
+        if let load = cpuSampler.sample() {
+            cpuLoad = load.total
+            cpuCoreLoads = load.perCore
+            append(&cpuLoadHistory, load.total)
+        }
+        gpuLoad = GPULoad.current()
+        if let gpu = gpuLoad { append(&gpuLoadHistory, gpu) }
+        thermalState = ProcessInfo.processInfo.thermalState
+
+        network = networkSampler.sample()
+        append(&downHistory, network.downBytesPerSec)
+        append(&upHistory, network.upBytesPerSec)
+
+        // Battery every ~10 s, Bluetooth peripherals every ~60 s — both change slowly.
+        if tickCount % 5 == 0 { battery = BatteryStats.current() }
+        if tickCount % 30 == 0 { refreshPeripheralBatteries() }
+        tickCount += 1
+    }
+
+    func refreshPeripheralBatteries() {
+        guard !isReadingPeripherals else { return }
+        isReadingPeripherals = true
+        Task.detached(priority: .utility) {
+            let list = PeripheralBatteries.current()
+            await MainActor.run { [weak self] in
+                self?.peripheralBatteries = list
+                self?.isReadingPeripherals = false
+            }
+        }
     }
 
     private func append(_ arr: inout [Double], _ v: Double) {
@@ -77,6 +125,10 @@ final class SystemMonitor: ObservableObject {
 }
 
 extension SystemMonitor {
+    /// macOS' own thermal pressure; anything above `.nominal` means the
+    /// system is (or is about to start) throttling.
+    var isThrottling: Bool { thermalState == .serious || thermalState == .critical }
+
     enum CPUState { case ok, warn, danger }
     var cpuState: CPUState {
         switch cpuTemp {

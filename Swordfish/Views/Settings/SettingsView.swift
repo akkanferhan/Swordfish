@@ -13,17 +13,23 @@ struct SettingsView: View {
     private let initialLanguage = AppLanguage.current
 
     enum SettingsTab: CaseIterable, Identifiable {
-        case general, permissions
+        case general, monitoring, clipboard, keys, permissions
         var id: Self { self }
         var label: LocalizedStringKey {
             switch self {
             case .general:     return "General"
+            case .monitoring:  return "Monitoring"
+            case .clipboard:   return "Clipboard"
+            case .keys:        return "Developer Keys"
             case .permissions: return "Permissions"
             }
         }
         var symbol: String {
             switch self {
             case .general:     return "gearshape"
+            case .monitoring:  return "waveform.path.ecg"
+            case .clipboard:   return "doc.on.clipboard"
+            case .keys:        return "key"
             case .permissions: return "lock.shield"
             }
         }
@@ -35,12 +41,15 @@ struct SettingsView: View {
             ScrollView {
                 switch tab {
                 case .general:     generalTab
+                case .monitoring:  MonitoringSettingsView()
+                case .clipboard:   ClipboardSettingsView()
+                case .keys:        DeveloperKeysSettingsView()
                 case .permissions: permissionsTab
                 }
             }
         }
         .padding(Spacing.mdLg)
-        .frame(minWidth: 500, idealWidth: 520, minHeight: 460, idealHeight: 540)
+        .frame(minWidth: 660, idealWidth: 680, minHeight: 460, idealHeight: 600)
         .task { permissions.refresh() }
     }
 

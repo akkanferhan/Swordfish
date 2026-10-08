@@ -17,6 +17,7 @@ struct SimulatorToolboxView: View {
         case location = "Location"
         case media = "Media"
         case apps = "Apps"
+        case device = "Device"
 
         var id: String { rawValue }
         var label: LocalizedStringKey {
@@ -26,6 +27,7 @@ struct SimulatorToolboxView: View {
             case .location:    return "Location"
             case .media:       return "Media"
             case .apps:        return "Apps"
+            case .device:      return "Device"
             }
         }
         var symbol: String {
@@ -35,6 +37,7 @@ struct SimulatorToolboxView: View {
             case .location:    return "location"
             case .media:       return "photo.on.rectangle"
             case .apps:        return "app.badge"
+            case .device:      return "faceid"
             }
         }
     }
@@ -136,10 +139,12 @@ struct SimulatorToolboxView: View {
     // MARK: - Tool chips
 
     private var toolChips: some View {
-        HStack(spacing: 4) {
-            ForEach(Tool.allCases) { t in
-                ToolChip(title: t.label, symbol: t.symbol, isSelected: tool == t) {
-                    withAnimation(Motion.default) { tool = t }
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 4) {
+                ForEach(Tool.allCases) { t in
+                    ToolChip(title: t.label, symbol: t.symbol, isSelected: tool == t) {
+                        withAnimation(Motion.default) { tool = t }
+                    }
                 }
             }
         }
@@ -153,6 +158,7 @@ struct SimulatorToolboxView: View {
         case .location:    LocationPanel(udid: selectedUDID)
         case .media:       MediaPanel(udid: selectedUDID)
         case .apps:        AppsPanel(udid: selectedUDID)
+        case .device:      DevicePanel(udid: selectedUDID)
         }
     }
 

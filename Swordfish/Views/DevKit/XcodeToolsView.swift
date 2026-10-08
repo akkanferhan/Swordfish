@@ -5,6 +5,7 @@ struct XcodeToolsView: View {
     @State private var isPurging = false
     @State private var isCleaning = false
     @State private var toast: String? = nil
+    @StateObject private var xcodes = XcodeVersionsService()
 
     private let derivedPath = "\(NSHomeDirectory())/Library/Developer/Xcode/DerivedData"
 
@@ -31,6 +32,8 @@ struct XcodeToolsView: View {
                 )
             }
 
+            activeXcodeRow
+
             if let toast {
                 Text(toast)
                     .font(Typography.monoSmall)
@@ -38,7 +41,62 @@ struct XcodeToolsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .task { await refreshSize() }
+        .task {
+            xcodes.refresh()
+            await refreshSize()
+        }
+    }
+
+    // MARK: - Active Xcode
+
+    /// Only shown with more than one Xcode installed — with a single one
+    /// there's nothing to switch to.
+    @ViewBuilder
+    private var activeXcodeRow: some View {
+        if xcodes.installs.count > 1 {
+            HStack(spacing: Spacing.sm) {
+                Image(systemName: "hammer.circle")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.TextColor.tertiary)
+                Text("Active Xcode")
+                    .font(Typography.monoSmall)
+                    .foregroundStyle(Theme.TextColor.tertiary)
+                Spacer()
+                if xcodes.isSwitching {
+                    ProgressView().controlSize(.small)
+                }
+                Menu {
+                    ForEach(xcodes.installs) { install in
+                        Button {
+                            xcodes.select(install)
+                        } label: {
+                            if install == xcodes.active {
+                                Label(install.label, systemImage: "checkmark")
+                            } else {
+                                Text(install.label)
+                            }
+                        }
+                    }
+                } label: {
+                    Text(xcodes.active?.label ?? xcodes.activePath ?? String(localized: "Not set"))
+                        .font(Typography.monoSmall)
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .disabled(xcodes.isSwitching)
+            }
+            .padding(.horizontal, Spacing.smMd)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
+                    .fill(Theme.Surface.surface1)
+            )
+            if let err = xcodes.lastError {
+                Text(err)
+                    .font(Typography.monoSmall)
+                    .foregroundStyle(Theme.Semantic.danger)
+            }
+        }
     }
 
     // MARK: - Actions
